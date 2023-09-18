@@ -1,0 +1,408 @@
+---
+title: "Analysis Workflow"
+author: "A. Cassano"
+date: "2023-09-18"
+output:   pdf_document:
+    fig_width: 6.25
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+- This code should be useable to analyze RNA-seq data. Please read through the document before making any changes. This is a template and will indicate where you need to make changes for your specific experiment. 
+- This R markdown file is broken down into "code chunks" that can be run individually. 
+  - Downstream chunks rely on upstream chunks so running code out of order is not recommended. 
+  - In R Studio, you can run a chunk by hitting the "play button" on the top right of the chunk. 
+  - You can run all upstream chunks by clicking the button that has a down arrow pointing to a green bar.
+
+Built with R version `r getRversion()`. Most recent template changes made on 
+
+# Prepare work-space
+
+## Install Packages 
+- This segment of code should only be run if the packages are not already installed on whichever computer this is being run on.
+- In order to have this chunk run, change `eval=FALSE` to `eval=TRUE` in the chunk header.
+- If you're running chunk by chunk be sure to run this chunk the first time but do not run this code subsequent times.
+- **Do not edit this chunk (other than changing eval to true)**
+```{r install_pkgs, eval=FALSE, echo=FALSE}
+install.packages(c("BiocManager",
+                   "tidyverse",
+                   "gplots",
+                   "ggplot2",
+                   "ggrepel",
+                   "stringi",
+                   "pheatmap",
+                   "RColorBrewer"))
+
+BiocManager::install(c("DESeq2",
+                       "GO.db",
+                       "GOstats",
+                       "pathview",
+                       "gage",
+                       "gageData",
+                       "GenomicRanges",
+                       "Repitools",
+                       "clusterProfiler",
+                       "DOSE",
+                       "pathview",
+                       "treemap",
+                       "ashr"))
+BiocManager::install("clusterProfiler")
+BiocManager::install("pathview")
+BiocManager::install("enrichplot")
+if (!require(devtools)) {
+  install.packages('devtools')
+}
+devtools::install_github('JamesJoly/DGSEA')
+devtools::install_github('amcassano/RNAseqAnalysisPackage')
+```
+
+## Set working directory 
+- This chunk will set the 'current working directory'. You must change this to reflect what folder you'll be working in.
+- The working directory is all where all outputs will be saved. All files being imported should also be in this folder.
+- **Your working directory should contain:**
+  - **CSV file containing all of the raw read counts obtained from the fastq files**
+  - **CSV file containing the meta-data for your experiment**
+  - **CSV files with any gene sets of interest**
+- Change the working directory variable (change what is in the quotes "") to reflect your current working directory. You will need to use the complete path.
+- The path should end with the name of the folder, you should omit the trailing '/'
+```{r workingdirectory}
+# set working directory
+cwd <- "parentfolder/childfolder/yourfolder"
+setwd(cwd)
+```
+
+
+# Data import and wrangling
+
+## Import CSV files
+- The `raw_counts` variable is set as the csv file containing the output of featurecounts after using STAR to align reads to the reference genome.
+  - The csv file must first be "cleaned up" by removing unneeded columns such as *Chr*, *start*, *end* etc.
+- The `meta` variable is set as the csv file containing metadata about the current experiment.
+  - At a minimum, it must contain sample names and conditions/groups.
+    - **the condition column must be named "Group"**
+    - **the sample ID column must be named "SampleID"**
+    - you can also include other information such as sac day, cell type, or anything else you might want to keep track of
+  - Samples not of interest (in a combined experiment, irrelevant groups) can be removed from both raw counts and metadata.
+  - The samples **must** be in the same order in the `meta` file as they are in `raw_counts`.
+- Strict pre-filtering is applied to the raw data to remove any genes that have a total count number across samples less than the user defined minimum.
+  - Additionally, genes that have a total count that is less than a user defined value, when the single max count is subtracted are removed.
+  - This is done to filter out genes that have a high read count for just one sample, but are not expressed in other samples. These filtering steps minimize noise and remove outliers.
+- Avoid using spaces or other whitespace in the names of your files, use '_' or CamelCase to separate words instead
+- Your file names must exactly match what you type below. Be sure to include the `.csv` file extension
+- **Things to change in this chunk:**
+    - countsCSV and metadataCSV file names
+```{r import_data}
+# import files
+countsCSV <- "yourcountsfile.csv"
+countsCSV <- paste(cwd, countsCSV, sep = "/")
+raw_counts <- read.csv(countsCSV, header = TRUE, sep = ",")
+
+metadataCSV <- "yourmetadatafile.csv"
+metadataCSV <- paste(cwd, metadataCSV, sep = "/")
+meta <- read.csv(metadataCSV, header = TRUE, sep = ",")
+```
+
+## Data wrangling
+These code chunks will make sure that the imported .csv files are in the correct format for use later on.
+
+### CSV Cleanup 
+- Set the row names as the GeneID in the counts file
+- Set groups as the data type `factor`
+  - replace whats in quotes with the names of your groups (add or remove lines as necessary)
+  - the contents of the "" must exactly match the group as it is written in your metadata csv file
+  - the order they appear is the order your groups will appear in plots and legends so fill in accordingly
+- Apply prefiltering to your data to retain only rows that
+  - have at more than minimum counts across all samples
+  - have a total count that is less than a user defined value, when the single max count is subtracted are removed.
+  - the more samples you have, the higher the number should be, the fewer samples you have the lower the number should be. It makes sense to set the number 300-1000
+  - This is done to filter out genes that have a high read count for just one sample, but are not expressed in other samples. This minimizes noise and removes outliers.
+- **Things to change in this chunk:**
+    - Group names
+    - count minimum
+    number of samples
+```{r csv_cleanup}
+# renames each row as the GeneID and removes the Geneid column
+rownames(raw_counts) <- raw_counts$Geneid
+raw_counts <-  dplyr::select(raw_counts, -Geneid)
+
+# set groups as factors
+meta$Group <- factor(meta$Group,
+                         levels = c("group1",
+                                    "group2",
+                                    "group3",
+                                    "group4",
+                                    "group5",
+                                    "group6"))
+
+# pre-filtering
+count_minimum <- 1000 
+numberofsamples <- 20
+raw_counts$row_max <- apply(raw_counts[,1:numberofsamples], 1, max)
+raw_counts$row_sum <- apply(raw_counts[,1:numberofsamples], 1, sum)
+raw_counts <- raw_counts %>%
+  dplyr::filter((raw_counts$row_sum - raw_counts$row_max) > count_minimum) %>%
+  dplyr::select(-c(row_max, row_sum))
+
+# set the sample ID as the row name for the metadata 
+row.names(meta) <- meta$SampleID
+meta <- meta %>% dplyr::select(-c(SampleID))
+
+```
+
+### Rename groups (optional)
+- If you want to rename any groups from how they appear in your csv files (i.e. 'rej' -> 'Acute Rejection') use the code below
+- If this is needed change `eval=FALSE` to `eval=TRUE`
+- Delete or add lines as needed
+- replace `group1`, `group2` etc with the name of the group you want to change
+- replace the text in quotes ("new name 1") with what you want the new group name to be
+- fill in the factoring list so that the new group names replace any old ones, include unchanged group names as well
+```{r rename_groups, eval=FALSE}
+# rename groups 
+meta$Group <- recode_factor(meta$Group, group1 = "new name 1")
+meta$Group <- recode_factor(meta$Group, group2 = "New name 2")
+meta$Group <- recode_factor(meta$Group, group3 = "new name 3")
+
+# refactor groups
+meta$Group <- factor(meta$Group,
+                         levels = c("new name 1",
+                                    "New name 2",
+                                    "new name 3",
+                                    "group4",
+                                    "group5",
+                                    "group6"))
+```
+
+
+# Set colors, shapes, labels for plots
+- Set global variables for plotting such as the color palette, labels, and shapes. 
+- The aesthetics dataframe is created for use in creating consistent plots throughout. 
+- one of the source functions has the different options for the colors and shapes in it
+- for outline color:
+  - choose from black, blue, orange, green, purple, red, yellow, brown, white, or grey
+  - fill in the blank "" with the color of you rchoice
+  - the colors should be in the same order as your groups, if you're unsure of the order run the first two lines of code in this chunk to see what the order is
+  - add or remove rows as necessary
+    - be sure each row except the last ends in a , 
+- for fill color:
+  - same deal as outline
+  - likely choose to make it the same as the outline colors
+  - you may however choose a white interior if you want something to be an open symbol 
+- for shapes:
+  - choose from 'circle', 'crossed circle', 'diamond', 'crossed diamond', 'square', 'crossed square', 'triangle up', 'triangle down', 'x', 'plus', 'asterik'
+  - fill in the blank "" (same concept as outline color)
+This code chunk will print out your group names and the options for your aesthetics
+```{r global_aesthetics}
+# get the names of the groups to assign to the colors/shapes
+sample_labels <- (meta$Group)
+group_labels <- unique(sample_labels) %>% sort() %>% print()
+
+getPalettes()
+```
+- **Things to change in this chunk:**
+    - the colors and shapes
+    - make sure that the number of arguments provided match the number of conditions you have
+    - add or remove lines from the anno colors in the below format for the number of different conditions you have
+```{r set_aesthetics}
+plot_aes <- set_aes(group_labels, 
+                    c("shape1", "shape2", "shape3"),
+                    c("outline1", "outline2", "outlin3"),
+                    c("fill1", "fill2", "fill3"))
+
+anno_colors <- list(
+  Group = c(
+    as.character(plot_aes$labels[1]) = as.character(plot_aes$outlineID[1]),
+    as.character(plot_aes$labels[2]) = as.character(plot_aes$outlineID[2]),
+    as.character(plot_aes$labels[3]) = as.character(plot_aes$outlineID[3]),
+    as.character(plot_aes$labels[4]) = as.character(plot_aes$outlineID[4]),
+    as.character(plot_aes$labels[5]) = as.character(plot_aes$outlineID[5]),
+    as.character(plot_aes$labels[6]) = as.character(plot_aes$outlineID[6])
+  )
+)             
+```
+
+# DESeq2 package 
+- Now that you've got everything set up, its time to start analysis!
+- The DESeq2 package has functions to find differentially expressed genes, statistics associated with this, and normalized counts.
+- First a DESeq data object is created using `raw_counts` and `meta`, specifying that `group` is the variable of interest in the metadata table. The `DESeq` function is run and from this output, normalized results (rlog transformed, and normalized counts).
+- if you have data subsets repeat all of this code with those subsets as well
+- Differential gene expression requires pairwise comparisons, however analysis using the normalized counts (UMAP, PCA, Sample Distances) use all samples at once. 
+## Create DESeq object and run deseq
+- This code will construct the DESeq data object which takes the raw counts and metadata as inputs. 
+- `design = ~Group` means that Group is your experimental variable
+  - design expresses how the counts for each gene depend on the variables in metadata
+  - If the experimental design is more complex than just group (i.e. group and cell type) then you can combine variables (i.e. `~ Group + CellType`)
+- deseq uses a generalized linear model and outputs a deseq2 object, we will use this to get normalized counts, p-values, and log-2 fold changes
+- **only change this chunk if you need to change the experiment design** 
+```{r DESeq2}
+dseq <- getDESeq(raw_counts, meta, ~Group)
+```
+
+## Regularized Log Transformation
+- This code will apply a regularized log transformation to the data.
+  - This transforms the count data to the log2 scale in a way which minimizes differences between samples for rows with small counts, and which normalizes with respect to library size. The rlog transformation produces a similar variance stabilizing effect as `varianceStabilizingTransformation`, though rlog is more robust in the case when the size factors vary widely. The transformation is useful when checking for outliers or as input for machine learning techniques such as clustering or linear discriminant analysis. rlog takes as input a `DESeqDataSet` and returns a `RangedSummarizedExperiment` object.
+- The rlog transformation takes more time to calculate than the VST function but it is more robust.
+- `blind = FALSE` should be included in the code
+  - Determines whether to blind the transformation to the experimental design. `blind=TRUE` should be used for comparing samples in an manner unbiased by prior information on samples (for QC). `blind=FALSE` should be used for transforming data for downstream analysis, where the full use of the design information should be made. If many of genes have large differences in counts due to the experimental design, it is important to set `blind=FALSE` for downstream analysis.
+- **nothing needs to be changed in this chunk**
+
+```{r rlog_normalization}
+rlog_norm <- rlog(dseq, blind = FALSE)
+rlog_df <- as.data.frame(assay(rlog_norm))
+```
+
+## Pairwise comparisons
+- Multiple pairwise comparisons can be made to determine the differentially expressed genes for any 2 given groups. 
+- Pairwise comparisons between 2 specified groups are saved as objects for use further on.
+- You can choose to use a Log Fold Change shrinking algorithm. This mitigates the effects of any single sample on the log fold change calculations, minimizing noise.
+    - add `log2FCshrink = TRUE` to the function call
+  - The calculation used is the "ashr" algorithm[@stephens2016].
+- **Things to change in this chunk:**
+    - add the number of comparisons desired, change the names of the numerator and denominator
+
+```{r degs}
+resultsNames(dseq)
+
+one_vs_two <- pairwiseDEGresults(numerator = "comparisongroup",
+                                denominator = "baselinegroup",
+                                deseq_obj = dseq)
+                                
+two_vs_three <- pairwiseDEGresults(numerator = "othergroup",
+                                denominator = "anotherone",
+                                deseq_obj = dseq)
+
+```
+
+
+# Annotate Results
+
+The initial `raw_counts` table, and therefore all DESeq results derived from it, use the *Ensembl ID* to identify each gene. However, this is not a useful identifier for most humans. The BiomaRt package can be used to match the *Ensembl ID* with it's corresponding *MGI Symbol*, *MGI Description*, *Gene Biotype*, and *Entrez (NCBI) ID*. The genemap can be altered to omit or include different attributes as needed. The genmap is then used along with a `deseq results object` in the `annotate_biomart()` function to add these descriptors to the results. Any data frame that has *Ensembl ID*s can be used in this annotation function. 
+**Nothing needs to be changed in this chunk**
+### make genemap
+```{r make_genemap}
+allgenes <- tibble::rownames_to_column(rlogDF, var = "GeneID")
+allgenes <- select(allgenes, GeneID)
+gmap <- createGenemap(allgenes,  GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description"))
+```
+
+### Annotate pairwise comparisons (DEGs)
+**change the names of your pairwise comparisons and add accordingly**
+```{r annotate_degs}
+
+one_vs_two <- annotate_biomart(one_vs_two, gmap) 
+two_vs_three <- annotate_biomart(two_vs_three, gmap) 
+
+rlog_df <- rownames_to_column(rlog_df, var = "GeneID")
+rlog_df <- annotate_biomart(rlog_df, genemap)
+
+```
+
+
+## Sort significantly differentially expressed genes
+
+The list of genes returned by the `results` function of the DESeq2 package contains all the genes above a 0.1 P value. This is a rather generous filtering, especially with so many genes and so many pairwise comparisons being done. The results also include some genes that have uncalculated P values or Log2 Fold Changes due to the presence of a sample that has been detected as "an extreme outlier". There are also results with uncalculated adjusted P values if there is a very low mean normalized count. The `signif_deg` function will filter out these genes. In addition, it will add a `Change Direction` column to indicate if a gene is upregulated or downregulated in the experimental group compared to the baseline group (as specified when retrieving results above). `Change Metric` is also added to each gene. This will calculate $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$. The `export_genelist` function will save the output of the `signif_deg` function as a csv, exporting it to the current working directory. The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included.
+**Change the threshold values (if desired), and adjust the results data frames being generated** 
+```{r signifDEG}
+
+# set thresholds for adjusted P values and log2 fold changes in determining which genes to keep as significant
+padj_threshold <- 0.01
+l2fc_threshold <- 1
+
+# create ranked and filtered list of dif expr genes
+ranked_OneTwo <- signif_deg(one_vs_two, padj_threshold, l2fc_threshold)
+ranked_TwoThree <- signif_deg(two_vs_three, padj_threshold, l2fc_threshold)
+
+```
+
+
+## Export lists of significantly DEGs
+**Change the exports and the file names, feel free to export just up/down/both and not all three**
+```{r exportlists}
+
+export_genelist(ranked_OneTwo, filename = "1vs2", direction = "up")
+export_genelist(ranked_OneTwo, filename = "1vs2", direction = "down")
+export_genelist(ranked_OneTwo, filename = "1vs2")
+
+export_genelist(ranked_TwoThree, filename = "2vs3", direction = "up")
+export_genelist(ranked_TwoThree, filename = "2vs3", direction = "down")
+export_genelist(ranked_TwoThree, filename = "2vs3")
+
+```
+
+## Sample to Sample Distances
+
+Plotting sample distances will illustrate the overall similarity between samples. This can be compared to what is expected by the experiment design. Rlog transformed data will be used for this to ensure that sample distance isn't overly due to certain highly expressed genes.
+**nothing needs to be changed here**
+```{r sample_distances}
+sample_distances(rlog_norm, anno_colors, meta)
+```
+
+## Plot counts
+
+The counts for specific genes can be plotted by group using the normalized counts. This can be done for specific genes of interest, or for the most significant genes. Using the `plot_genecounts` function, the data can be saved to an object for plotting with ggplot
+
+
+```{r plot_counts}
+
+kwh = 0.55
+kwv = 1
+
+
+
+```
+
+## Principal Component Analysis
+
+Principal component analysis will illustrate the differences between samples as a whole, reducing the number of dimensions.
+**Change the title and if you want to label the dots change it to TRUE**
+```{r PCA_analysis}
+# run the function
+pca_analysis(dseq_transform = rlog_norm,
+             plot_aes = plot_aes
+             plot_title = "PCA",
+             label_samples = FALSE)
+
+
+```
+
+## UMAP
+Umap description here. *Warning:* Everytime the UMAP function is (re)run, the resulting plot will be different. This is due to "randomness"[^1] inherent in the UMAP algorithm. Either take steps to force reproducible results, or be cautious when re-running UMAP function. The result of the UMAP function is saved as an object so the plot can be displayed without re-calculating UMAP.
+
+[^1]: It does not incorporate "true randomness" since computers are not capable of this. Functions achieve "pseudorandomness" by setting a number called a seed which changes every time the function is run. This number is generated using the system clock of the computer. The results can be forced to be reproducible by adding `batch = TRUE` to the umap() call, and by adding `set.seed(x)` where `x` is an integer you choose.
+
+**you can change the seed around, play with the neighbors and m Dist, change the title and toggle labels**
+```{r umapAnalysis, warning=FALSE, eval=FALSE}
+set.seed(5)
+rlogUMAP <- umap_analysis(dseq_transform = rlog_norm,
+                          neighbors = 3,
+                          m_dist = 0.5,
+                          cond_list = sample_labels,
+                          plot_aes = plot_aes,
+                          plot_title = "rlog Normalized UMAP",
+                          batch = TRUE,
+                          label_samples = FALSE)
+
+rlogUMAP
+```
+
+## Gene Set Enrichment Analysis
+
+The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color). This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value. -
+
+
+## Heatmaps
+
+This code chunk will create a heatmap of the most significantly changed genes across all samples and their expression in each sample. This visualization can easily show the effects of treatments on different genes. It also will cluster genes. Gene sets gotten from GSEA
+
+### Volcano Plot
+
+Make a volcano plot.
+
+
+### Shared Genes
+
+
+### VennDiagram
