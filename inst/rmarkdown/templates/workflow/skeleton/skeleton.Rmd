@@ -60,6 +60,53 @@ devtools::install_github('JamesJoly/DGSEA')
 devtools::install_github('amcassano/RNAseqAnalysisPackage')
 ```
 
+## Load packages 
+
+- The first step is to load the R "packages" needed for all of the code below. These will be used for data manipulation, analysis, and visualization.
+- **Do not change code in this chunk**
+
+```{r load_pkgs, echo=FALSE, warning=FALSE, error=FALSE, message=FALSE}
+library(devtools)
+library(roxygen2)
+library(tidyverse)
+library(utils) 
+library(stringi)
+library(stringr)
+library(knitr)
+library(rmarkdown)
+library(biomaRt) 
+library(DESeq2) 
+library(ashr)
+library(ggplot2)
+library(ggrepel)
+library(RColorBrewer)
+library(uwot)
+library(ggVennDiagram)
+library(pheatmap)
+library(tinytex)
+library(DGSEA)
+library(analyzeRNA)
+
+
+library(org.Mm.eg.db)
+library(ggridges)
+
+library(ggpubr)
+
+
+ #this will allow us to create heatmaps
+library(clusterProfiler)
+library(treemap)
+library(DOSE)
+library(pathview)
+library(SPIA)
+library(enrichplot)
+
+
+```
+
+
+
 ## Set working directory 
 - This chunk will set the 'current working directory'. You must change this to reflect what folder you'll be working in.
 - The working directory is all where all outputs will be saved. All files being imported should also be in this folder.
@@ -340,19 +387,6 @@ Plotting sample distances will illustrate the overall similarity between samples
 sample_distances(rlog_norm, anno_colors, meta)
 ```
 
-## Plot counts
-
-The counts for specific genes can be plotted by group using the normalized counts. This can be done for specific genes of interest, or for the most significant genes. Using the `plot_genecounts` function, the data can be saved to an object for plotting with ggplot
-
-
-```{r plot_counts}
-
-kwh = 0.55
-kwv = 1
-
-
-
-```
 
 ## Principal Component Analysis
 
@@ -368,8 +402,9 @@ pca_analysis(dseq_transform = rlog_norm,
 
 ```
 
+
 ## UMAP
-Umap description here. *Warning:* Everytime the UMAP function is (re)run, the resulting plot will be different. This is due to "randomness"[^1] inherent in the UMAP algorithm. Either take steps to force reproducible results, or be cautious when re-running UMAP function. The result of the UMAP function is saved as an object so the plot can be displayed without re-calculating UMAP.
+Umap description here. *Warning:* Everytime the UMAP function is (re)run, the resulting plot will be different. This is due to "randomness"[^1] inherent in the UMAP algorithm. Either take steps to force reproducible results, or be cautious when re-running UMAP function. The result of the UMAP function is saved as an object so the plot can be displayed without re-calculating UMAP. Odds are that you won't want to use a UMAP unless you have sc sequencing data but its here anyway because I already wrote the code.
 
 [^1]: It does not incorporate "true randomness" since computers are not capable of this. Functions achieve "pseudorandomness" by setting a number called a seed which changes every time the function is run. This number is generated using the system clock of the computer. The results can be forced to be reproducible by adding `batch = TRUE` to the umap() call, and by adding `set.seed(x)` where `x` is an integer you choose.
 
@@ -388,17 +423,29 @@ rlogUMAP <- umap_analysis(dseq_transform = rlog_norm,
 rlogUMAP
 ```
 
-## Gene Set Enrichment Analysis
 
-The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color). This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value. -
+## Plot counts
+
+The counts for specific genes can be plotted by group using the normalized counts. This can be done for specific genes of interest, or for the most significant genes. Using the `plot_genecounts` function, the data can be saved to an object for plotting with ggplot
+```{r plot_counts}
+
+kwh = 0.55
+kwv = 1
+
+
+
+```
+
+
+## Gene Set Enrichment Analysis
+The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color). This plot displays the top 50 genes by gene ratio (# genes related to GO term / total number of sig genes), not p-adjusted value. -
+
 
 
 ## Heatmaps
-
 This code chunk will create a heatmap of the most significantly changed genes across all samples and their expression in each sample. This visualization can easily show the effects of treatments on different genes. It also will cluster genes. Gene sets gotten from GSEA
 
 ### Volcano Plot
-
 Make a volcano plot.
 
 
