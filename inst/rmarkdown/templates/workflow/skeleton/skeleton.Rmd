@@ -35,6 +35,7 @@ install.packages(c("BiocManager",
                    "ggrepel",
                    "stringi",
                    "pheatmap",
+                   "stats"
                    "RColorBrewer"))
 
 BiocManager::install(c("DESeq2",
@@ -85,8 +86,11 @@ library(ggVennDiagram)
 library(pheatmap)
 library(tinytex)
 library(DGSEA)
-library(analyzeRNA)
-
+library(stats)
+library(enrichplot)
+library(clusterProfiler)
+library(DOSE)
+library(analyzeRNA) #arguably the most important line of code
 
 library(org.Mm.eg.db)
 library(ggridges)
@@ -97,7 +101,7 @@ library(ggpubr)
  #this will allow us to create heatmaps
 library(clusterProfiler)
 library(treemap)
-library(DOSE)
+
 library(pathview)
 library(SPIA)
 library(enrichplot)
