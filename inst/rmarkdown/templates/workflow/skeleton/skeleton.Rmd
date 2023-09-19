@@ -26,7 +26,7 @@ Built with R version `r getRversion()`. Most recent template changes made on
 - This segment of code should only be run if the packages are not already installed on whichever computer this is being run on.
 - In order to have this chunk run, change `eval=FALSE` to `eval=TRUE` in the chunk header.
 - If you're running chunk by chunk be sure to run this chunk the first time but do not run this code subsequent times.
-- **Do not edit this chunk (other than changing eval to true)**
+- **Do not edit this chunk (just hit the run chunk button if needed)**
 ```{r install_pkgs, eval=FALSE, echo=FALSE}
 install.packages(c("BiocManager",
                    "tidyverse",
@@ -145,7 +145,7 @@ setwd(cwd)
 - Avoid using spaces or other whitespace in the names of your files, use '_' or CamelCase to separate words instead
 - Your file names must exactly match what you type below. Be sure to include the `.csv` file extension
 - **Things to change in this chunk:**
-    - countsCSV and metadataCSV file names
+    - `countsCSV` and `metadataCSV` file names
 ```{r import_data}
 # import files
 countsCSV <- "yourcountsfile.csv"
@@ -166,7 +166,7 @@ These code chunks will make sure that the imported .csv files are in the correct
   - replace whats in quotes with the names of your groups (add or remove lines as necessary)
   - the contents of the "" must exactly match the group as it is written in your metadata csv file
   - the order they appear is the order your groups will appear in plots and legends so fill in accordingly
-- Apply prefiltering to your data to retain only rows that
+- Apply pre-filtering to your data to retain only rows that
   - have at more than minimum counts across all samples
   - have a total count that is less than a user defined value, when the single max count is subtracted are removed.
   - the more samples you have, the higher the number should be, the fewer samples you have the lower the number should be. It makes sense to set the number 300-1000
@@ -174,7 +174,7 @@ These code chunks will make sure that the imported .csv files are in the correct
 - **Things to change in this chunk:**
     - Group names
     - count minimum
-    number of samples
+    - number of samples
 ```{r csv_cleanup}
 # renames each row as the GeneID and removes the Geneid column
 rownames(raw_counts) <- raw_counts$Geneid
@@ -209,7 +209,7 @@ meta <- meta %>% dplyr::select(-c(SampleID))
 - If this is needed change `eval=FALSE` to `eval=TRUE`
 - Delete or add lines as needed
 - replace `group1`, `group2` etc with the name of the group you want to change
-- replace the text in quotes ("new name 1") with what you want the new group name to be
+- replace the text in quotes (`"new name 1"`) with what you want the new group name to be
 - fill in the factoring list so that the new group names replace any old ones, include unchanged group names as well
 ```{r rename_groups, eval=FALSE}
 # rename groups 
@@ -234,7 +234,7 @@ meta$Group <- factor(meta$Group,
 - one of the source functions has the different options for the colors and shapes in it
 - for outline color:
   - choose from black, blue, orange, green, purple, red, yellow, brown, white, or grey
-  - fill in the blank "" with the color of you rchoice
+  - fill in the `""` with the color of your choice
   - the colors should be in the same order as your groups, if you're unsure of the order run the first two lines of code in this chunk to see what the order is
   - add or remove rows as necessary
     - be sure each row except the last ends in a , 
@@ -244,8 +244,8 @@ meta$Group <- factor(meta$Group,
   - you may however choose a white interior if you want something to be an open symbol 
 - for shapes:
   - choose from 'circle', 'crossed circle', 'diamond', 'crossed diamond', 'square', 'crossed square', 'triangle up', 'triangle down', 'x', 'plus', 'asterik'
-  - fill in the blank "" (same concept as outline color)
-This code chunk will print out your group names and the options for your aesthetics
+  - fill in the `""` (same concept as outline color)
+This code chunk will print out your group names and the options for your aesthetics **no need to change anything here**
 ```{r global_aesthetics}
 # get the names of the groups to assign to the colors/shapes
 sample_labels <- (meta$Group)
@@ -256,7 +256,7 @@ getPalettes()
 - **Things to change in this chunk:**
     - the colors and shapes
     - make sure that the number of arguments provided match the number of conditions you have
-    - add or remove lines from the anno colors in the below format for the number of different conditions you have
+    - add or remove lines from the `anno_colors` in the below format for the number of different conditions you have
 ```{r set_aesthetics}
 plot_aes <- set_aes(group_labels, 
                     c("shape1", "shape2", "shape3"),
@@ -282,7 +282,7 @@ anno_colors <- list(
 - if you have data subsets repeat all of this code with those subsets as well
 - Differential gene expression requires pairwise comparisons, however analysis using the normalized counts (UMAP, PCA, Sample Distances) use all samples at once. 
 ## Create DESeq object and run deseq
-- This code will construct the DESeq data object which takes the raw counts and metadata as inputs. 
+- This code will construct the `DESeqDataSet` which takes the raw counts and metadata as inputs. 
 - `design = ~Group` means that Group is your experimental variable
   - design expresses how the counts for each gene depend on the variables in metadata
   - If the experimental design is more complex than just group (i.e. group and cell type) then you can combine variables (i.e. `~ Group + CellType`)
@@ -294,9 +294,11 @@ dseq <- getDESeq(raw_counts, meta, ~Group)
 
 ## Regularized Log Transformation
 - This code will apply a regularized log transformation to the data.
-  - This transforms the count data to the log2 scale in a way which minimizes differences between samples for rows with small counts, and which normalizes with respect to library size. The rlog transformation produces a similar variance stabilizing effect as `varianceStabilizingTransformation`, though rlog is more robust in the case when the size factors vary widely. The transformation is useful when checking for outliers or as input for machine learning techniques such as clustering or linear discriminant analysis. rlog takes as input a `DESeqDataSet` and returns a `RangedSummarizedExperiment` object.
-- The rlog transformation takes more time to calculate than the VST function but it is more robust.
-- `blind = FALSE` should be included in the code
+  - This transforms the count data to the log2 scale in a way which minimizes differences between samples for rows with small counts, and which normalizes with respect to library size. - - The `rlogtransformation` produces a similar variance stabilizing effect as `varianceStabilizingTransformation`, though rlog is more robust in the case when the size factors vary widely.
+  - The transformation is useful when checking for outliers or as input for machine learning techniques such as clustering or linear discriminant analysis. 
+  - rlog takes as input a `DESeqDataSet` and returns a `RangedSummarizedExperiment` object.
+  - The rlog transformation takes more time to calculate than the VST function but it is more robust.
+- `blind = FALSE` must be included in the code
   - Determines whether to blind the transformation to the experimental design. `blind=TRUE` should be used for comparing samples in an manner unbiased by prior information on samples (for QC). `blind=FALSE` should be used for transforming data for downstream analysis, where the full use of the design information should be made. If many of genes have large differences in counts due to the experimental design, it is important to set `blind=FALSE` for downstream analysis.
 - **nothing needs to be changed in this chunk**
 
@@ -309,10 +311,10 @@ rlog_df <- as.data.frame(assay(rlog_norm))
 - Multiple pairwise comparisons can be made to determine the differentially expressed genes for any 2 given groups. 
 - Pairwise comparisons between 2 specified groups are saved as objects for use further on.
 - You can choose to use a Log Fold Change shrinking algorithm. This mitigates the effects of any single sample on the log fold change calculations, minimizing noise.
-    - add `log2FCshrink = TRUE` to the function call
-  - The calculation used is the "ashr" algorithm[@stephens2016].
+    - add `log2FCshrink = TRUE` to the function call if you want to use this
+  - The calculation used is the "ashr" algorithm [@stephens2016].
 - **Things to change in this chunk:**
-    - add the number of comparisons desired, change the names of the numerator and denominator
+    - add the number of comparisons desired, change the names of the numerator and denominator and the names of the objects you're storing the results in 
 
 ```{r degs}
 resultsNames(dseq)
@@ -330,17 +332,21 @@ two_vs_three <- pairwiseDEGresults(numerator = "othergroup",
 
 # Annotate Results
 
-The initial `raw_counts` table, and therefore all DESeq results derived from it, use the *Ensembl ID* to identify each gene. However, this is not a useful identifier for most humans. The BiomaRt package can be used to match the *Ensembl ID* with it's corresponding *MGI Symbol*, *MGI Description*, *Gene Biotype*, and *Entrez (NCBI) ID*. The genemap can be altered to omit or include different attributes as needed. The genmap is then used along with a `deseq results object` in the `annotate_biomart()` function to add these descriptors to the results. Any data frame that has *Ensembl ID*s can be used in this annotation function. 
-**Nothing needs to be changed in this chunk**
-### make genemap
+- The initial `raw_counts` table, and therefore all DESeq results derived from it, use the *Ensembl ID* to identify each gene. However, this is not a useful identifier for most humans. 
+- The BiomaRt package can be used to match the *Ensembl ID* with it's corresponding *MGI Symbol*, *MGI Description*, (and optionally things like the *Gene Biotype*, and *Entrez (NCBI) ID*). 
+- The genemap can be altered to omit or include different attributes as needed. 
+- The genemap is then used along with a `deseq results object` in the `annotate_biomart()` function to add these descriptors to the results. 
+- Any data frame that has *Ensembl ID*s in a column called `GeneID` can be used in this annotation function. 
+- **Nothing needs to be changed in this chunk (unless you want to add more things like gene biotype)**
+## make genemap
 ```{r make_genemap}
 allgenes <- tibble::rownames_to_column(rlogDF, var = "GeneID")
 allgenes <- select(allgenes, GeneID)
 gmap <- createGenemap(allgenes,  GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description"))
 ```
 
-### Annotate pairwise comparisons (DEGs)
-**change the names of your pairwise comparisons and add accordingly**
+## Annotate pairwise comparisons (DEGs)
+- **change the names of your pairwise comparisons and add accordingly**
 ```{r annotate_degs}
 
 one_vs_two <- annotate_biomart(one_vs_two, gmap) 
@@ -351,11 +357,15 @@ rlog_df <- annotate_biomart(rlog_df, genemap)
 
 ```
 
-
-## Sort significantly differentially expressed genes
-
-The list of genes returned by the `results` function of the DESeq2 package contains all the genes above a 0.1 P value. This is a rather generous filtering, especially with so many genes and so many pairwise comparisons being done. The results also include some genes that have uncalculated P values or Log2 Fold Changes due to the presence of a sample that has been detected as "an extreme outlier". There are also results with uncalculated adjusted P values if there is a very low mean normalized count. The `signif_deg` function will filter out these genes. In addition, it will add a `Change Direction` column to indicate if a gene is upregulated or downregulated in the experimental group compared to the baseline group (as specified when retrieving results above). `Change Metric` is also added to each gene. This will calculate $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$. The `export_genelist` function will save the output of the `signif_deg` function as a csv, exporting it to the current working directory. The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included.
-**Change the threshold values (if desired), and adjust the results data frames being generated** 
+# Filter and sort significantly differentially expressed genes
+- The list of genes returned by the `results` function of the DESeq2 package contains all the genes above a 0.1 P value. 
+  - This is a rather generous filtering, especially with so many genes and so many pairwise comparisons being done. 
+  - The results also include some genes that have uncalculated P values or Log2 Fold Changes due to the presence of a sample that has been detected as "an extreme outlier". 
+  - There are also results with uncalculated adjusted P values if there is a very low mean normalized count. 
+- The `signif_deg` function will filter out these genes and only keep DEGs that meet a user specified adjusted Pvalue threshold and log 2 fold change threshold 
+- In addition, it will add a `Change Direction` column to indicate if a gene is upregulated or downregulated in the experimental group compared to the baseline group (as specified when retrieving results above). 
+- `Change Metric` is also added to each gene. This will calculate $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$. 
+- **Change the threshold values (if desired), and adjust the results data frames being generated** 
 ```{r signifDEG}
 
 # set thresholds for adjusted P values and log2 fold changes in determining which genes to keep as significant
@@ -368,9 +378,9 @@ ranked_TwoThree <- signif_deg(two_vs_three, padj_threshold, l2fc_threshold)
 
 ```
 
-
 ## Export lists of significantly DEGs
-**Change the exports and the file names, feel free to export just up/down/both and not all three**
+- The `export_genelist` function will save the output of the `signif_deg` function as a csv, exporting it to the current working directory. The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included
+- **Change the exports and the file names, feel free to export just up/down/both and not all three**
 ```{r exportlists}
 
 export_genelist(ranked_OneTwo, filename = "1vs2", direction = "up")
@@ -383,14 +393,14 @@ export_genelist(ranked_TwoThree, filename = "2vs3")
 
 ```
 
-## Sample to Sample Distances
-
-Plotting sample distances will illustrate the overall similarity between samples. This can be compared to what is expected by the experiment design. Rlog transformed data will be used for this to ensure that sample distance isn't overly due to certain highly expressed genes.
-**nothing needs to be changed here**
+# Sample to Sample Distances
+- Plotting sample distances will illustrate the overall similarity between samples. 
+- This can be compared to what is expected by the experiment design. 
+- Rlog transformed data will be used for this to ensure that sample distance isn't overly due to certain highly expressed genes.
+- **nothing needs to be changed here**
 ```{r sample_distances}
 sample_distances(rlog_norm, anno_colors, meta)
 ```
-
 
 ## Principal Component Analysis
 
