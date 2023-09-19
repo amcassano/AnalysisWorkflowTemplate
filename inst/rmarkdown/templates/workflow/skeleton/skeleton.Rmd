@@ -35,7 +35,7 @@ install.packages(c("BiocManager",
                    "ggrepel",
                    "stringi",
                    "pheatmap",
-                   "stats"
+                   "stats",
                    "RColorBrewer"))
 
 BiocManager::install(c("DESeq2",
@@ -50,6 +50,7 @@ BiocManager::install(c("DESeq2",
                        "DOSE",
                        "pathview",
                        "treemap",
+                       "biomaRt",
                        "ashr"))
 BiocManager::install("clusterProfiler")
 BiocManager::install("pathview")
