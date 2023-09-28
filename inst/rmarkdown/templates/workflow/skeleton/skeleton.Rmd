@@ -13,6 +13,7 @@ output:
   pdf_document:
     number_sections: yes
     keep_tex: yes
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -32,6 +33,12 @@ knitr::opts_chunk$set(echo = TRUE)
     -   In R Studio, you can run a chunk by hitting the "play button (▶️)" on the top right of the chunk.
 
     -   You can run all upstream chunks by clicking the button that has a down arrow pointing to a green bar.
+
+-   I've tried to include handy-dandy tables throughout this template to describe the inputs you need to provide for the functions I've written.
+    The functions all also have R documentation attached to them.
+    In R studio if you put your mouse cursor on the function name and hit F1 it should pop up the help information for the function.
+    Alternatively, click on the function name and use the toolbar.
+    Click the 'Code' tab then find 'Go to Help'.
 
 *Built with R version 4.3.1. Most recent template changes made on September 28, 2023*
 
@@ -292,9 +299,10 @@ analyzeRNA::getPalettes()
 ```{r set_aesthetics, eval=FALSE}
 plot_aes <- analyzeRNA::set_aes(group_labels, 
                     c("shape1", "shape2", "shape3"),
-                    c("outline1", "outline2", "outlin3"),
+                    c("outline1", "outline2", "outline3"),
                     c("fill1", "fill2", "fill3"))
 
+# for heatmaps
 anno_colors <- list(
   Group = c(
     as.character(plot_aes$labels[1]) = as.character(plot_aes$outlineID[1]),
@@ -346,6 +354,8 @@ dseq <- analyzeRNA::getDESeq(raw_counts, meta, ~Group)
 -   The transformation is useful when checking for outliers or as input for machine learning techniques such as clustering or linear discriminant analysis.
 
 -   rlog takes as input a `DESeqDataSet` and returns a `RangedSummarizedExperiment` object.
+    We will also save this same information as a data frame.
+    We need both for various parts of code below.
 
 -   `blind = FALSE` must be included in the code.
     This determines whether to blind the transformation to the experimental design.
@@ -368,16 +378,35 @@ rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
 -   You can choose to use a Log Fold Change shrinking algorithm.
     This mitigates the effects of any single sample on the log fold change calculations, minimizing noise.
     Add `log2FCshrink = TRUE` to the function call if you want to use this.
-    The calculation used is the "ashr" algorithm [@stephens2016].
+    The calculation used is the "ashr" algorithm (@stephens2016.)
 
-| Input                     | Required?                       | Example                    | Notes                                                                                                                                 |
-|----------------|----------------|----------|-------------------------------|
-| `numerator` string        | Required                        | `"Tolerant"` `"Naive"` etc | Must match exactly the way it's written in the DESeq object. If unsure run just the `resultsNames(dseq)` line of code.                |
-| `denominator` string      | Required                        | `"Tolerant"` `"Naive"` etc | Must match exactly the way it's written in the DESeq object. If unsure run just the `resultsNames(dseq)` line of code.                |
-| `dseq_obj` DESeqObject    | Required                        | dseq                       | This is the DESeq object we saved two chunks above. Don't change the name of it unless you also changed the name in the above chunks. |
-| `contrast_str` string     | Optional; defaults to `"Group"` |                            |                                                                                                                                       |
-| `tidy_result` TRUE/FALSE  | Optional; defaults to `TRUE`    |                            |                                                                                                                                       |
-| `log2FCshrink` TRUE/FALSE | Optional; defaults to `FALSE`   |                            |                                                                                                                                       |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Input          | Required?             | Example                      | Notes                                                                                                                                                                                                     |
++================+=======================+==============================+===========================================================================================================================================================================================================+
+| `numerator`    | Required              | `"Tolerant"` `"Naive"` etc   | Must match exactly the way it's written in the DESeq object. If unsure run just the `resultsNames(dseq)` line of code.                                                                                    |
+|                |                       |                              |                                                                                                                                                                                                           |
+| string         |                       |                              |                                                                                                                                                                                                           |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `denominator`  | Required              | `"Tolerant"` `"Naive"` etc   | Must match exactly the way it's written in the DESeq object. If unsure run just the `resultsNames(dseq)` line of code.                                                                                    |
+|                |                       |                              |                                                                                                                                                                                                           |
+| string         |                       |                              |                                                                                                                                                                                                           |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `dseq_obj`     | Required              | dseq                         | This is the DESeq object we saved two chunks above. Don't change the name of it unless you also changed the name in the above chunks.                                                                     |
+|                |                       |                              |                                                                                                                                                                                                           |
+| DESeqObject    |                       |                              |                                                                                                                                                                                                           |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `contrast_str` | Optional;             | `"Group"`, `"Condition"` etc | This will be indicate what is the independent variable in your data. If you set things up as I described above it should be Group. If not, you may need to specify Condition or something else like that. |
+|                |                       |                              |                                                                                                                                                                                                           |
+| string         | defaults to `"Group"` |                              |                                                                                                                                                                                                           |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `tidy_result`  | Optional;             | `TRUE` or `FALSE`            | When set to TRUE the results will output as a nice dataframe. IDK why you'd want to change that. Odds are you'll leave it be                                                                              |
+|                |                       |                              |                                                                                                                                                                                                           |
+| TRUE/FALSE     | defaults to `TRUE`    |                              |                                                                                                                                                                                                           |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `log2FCshrink` | Optional;             | `TRUE` or `FALSE`            | If you've got a lot of variance going on in your data you might want to set this to TRUE. It will do some math to handle that. I don't understand the math but feel free to look it up if you care to.    |
+|                |                       |                              |                                                                                                                                                                                                           |
+| TRUE/FALSE     | defaults to `FALSE`   |                              |                                                                                                                                                                                                           |
++----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Pairwise Comparison Function Inputs
 
@@ -423,11 +452,21 @@ gmap <- analyzeRNA::createGenemap(allgenes,  GMattributes = c("ensembl_gene_id",
 
 ## Annotate pairwise comparisons (DEGs)
 
-| Input                     | Required?                                      | Example                                    | Notes                                                                                                                                |
-|------------|------------|----------------|------------------------------------|
-| `res` results dataframe   | Required                                       | `rlog_df`, a pairwise comparison dataframe | must include 'GeneID' column with ensembl ID                                                                                         |
-| `gm` genemap              | Required                                       | `gmap`                                     | created using the chunk above                                                                                                        |
-| `gmattri` list of strings | Optional; defaults to MGI symbol & description | `c("MGI_Symbol", "MGI_Desc", "GeneType")`  | Dictates which columns from the gene map are kept after renaming and reordering. Can't include a column not present in the genemap.  |
++-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
+| Input             | Required?                            | Example                                    | Notes                                                                                                                               |
++===================+======================================+============================================+=====================================================================================================================================+
+| `res`             | Required                             | `rlog_df`, a pairwise comparison dataframe | must include 'GeneID' column with ensembl ID                                                                                        |
+|                   |                                      |                                            |                                                                                                                                     |
+| results dataframe |                                      |                                            |                                                                                                                                     |
++-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
+| `gm`              | Required                             | `gmap`                                     | created using the chunk above                                                                                                       |
+|                   |                                      |                                            |                                                                                                                                     |
+| genemap           |                                      |                                            |                                                                                                                                     |
++-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
+| `gmattri`         | Optional;                            | `c("MGI_Symbol",`                          | Dictates which columns from the gene map are kept after renaming and reordering. Can't include a column not present in the genemap. |
+|                   |                                      |                                            |                                                                                                                                     |
+| list of strings   | defaults to MGI symbol & description | `"MGI_Desc", "GeneType")`                  |                                                                                                                                     |
++-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
 
 : Annotation Function Inputs
 
@@ -482,15 +521,18 @@ ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three, padj_threshold, l2fc_thr
 # Export lists of significantly DEGs
 
 The `export_genelist` function will save the output of the `signif_deg` function as a csv, exporting it to the current working directory.
-The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included
+The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included.
+**Do NOT include white space in the file name**
 
-| Input       | Required?                  | Example | Notes |
-|-------------|----------------------------|---------|-------|
-| `tab`       | Required                   |         |       |
-| `filename`  | Required                   |         |       |
-| `direction` | Optional; defaults to both |         |       |
-|             |                            |         |       |
-|             |                            |         |       |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+| Input              | Required?                  | Example/Options                             | Notes                                                                                                                                          |
++:===================+============================+=============================================+================================================================================================================================================+
+| `tab` data frame   | Required                   | the annotated and filtered signficiant DEGs |                                                                                                                                                |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+| `filename` string  | Required                   | `"TolVsNaiveSignifDEGs"`                    | If you are exporting just up or down the function will append up or down to the end of the file name. `".csv"` is not needed in the file name. |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+| `direction` string | Optional; defaults to both | `"up"`, `"down"`, or leave it blank         | if you use anything other than up or down it will export everything.                                                                           |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Export DEGs function inputs
 
@@ -525,7 +567,7 @@ Plotting sample distances will illustrate the overall similarity between samples
 This can be compared to what is expected by the experiment design.
 Rlog transformed data will be used for this to ensure that sample distance isn't overly due to certain highly expressed genes.
 
-[**Do not edit**]{style="color: red"}
+[**Do not edit this chunk**]{style="color: red"}
 
 ```{r sample_distances, eval=FALSE}
 analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
@@ -554,13 +596,29 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
     -   For a PCA plot to really give good information, you would hope to see the principal components account for \~50-60% of the total variance.
         Ideally, PC1 would account for \~30+% of the variance.
 
-| Input | Required? | Example | Notes |
-|-------|-----------|---------|-------|
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
++-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+| Input                 | Required?                                    | Example                                                      | Notes                                                                                                                                   |
++=======================+==============================================+==============================================================+=========================================================================================================================================+
+| `dseq_transform`      | Required                                     | `rlog_norm`                                                  | you need to use the actual object and not the data frame for this                                                                       |
+|                       |                                              |                                                              |                                                                                                                                         |
+| DESeqTransform object |                                              |                                                              |                                                                                                                                         |
++-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+| `plot_aes`            | Required                                     | `plot_aes`                                                   | use the dataframe created in the set_aesthetics chunk                                                                                   |
+|                       |                                              |                                                              |                                                                                                                                         |
+| dataframe             |                                              |                                                              |                                                                                                                                         |
++-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+| `grouping_var`        | Optional;                                    | `"Group"` `"Condition"` etc                                  | Should match the grouping variable used everywhere else                                                                                 |
+|                       |                                              |                                                              |                                                                                                                                         |
+| string                | defaults to `"Group"`                        |                                                              |                                                                                                                                         |
++-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+| `plot_title`          | Optional;                                    | Any title for the plot you desire. Make sure it's in quotes. |                                                                                                                                         |
+|                       |                                              |                                                              |                                                                                                                                         |
+| string                | defaults to `"Principal Component Analysis"` |                                                              |                                                                                                                                         |
++-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+| `label_samples`       | Optional;                                    | `TRUE` or `FALSE`                                            | Setting to True will add labels to (some of) the data points in the plot. Most helpful when you want to be able to identify an outlier. |
+|                       |                                              |                                                              |                                                                                                                                         |
+| TRUE/FALSE            | defaults to `FALSE`                          |                                                              |                                                                                                                                         |
++-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
 
 : PCA function inputs
 
@@ -614,29 +672,61 @@ The counts for specific genes can be plotted by group using the normalized count
 This can be done for specific genes of interest.
 Using the `plot_genecounts` function, the data can be saved to an object for plotting.
 
-Required Function Inputs:
-
--   MGI symbol for the gene of interest,
--   annotated data frame of rlog annotated counts
--   the metadata data frame
--   plot aesthetics.
-
-Optional Inputs:
-
--   a list of comparisons to get p values for. The format for this is \`comparisons = list(c("condition1", "condition2"), c("condition2", "condition3")) adding as many comparisons as desired. The order of comparisons in the list will correspond to the order in which the pvalues are plotted on the graph.
--   changing the y axis label using `yaxis = "my custom axis label"`. it defaults to "rLog Normalized Reads"
--   labeling the samples using `label_samples = TRUE`, it defaults to false
--   you can also set it so the Y axis is forced to go to 0. By default the Y axis will zoom in around the counts. You can change this by including `yaxistozero = TRUE`
--   you can change the location of the kruskal wallis statistic that will be included using `kw_hjust = yournumberhere` and `kw_vjust = yournumberhere`
--   by default the x axis will split your samples according to the Group variable, if there is a different name for it (i.e. condition) you can include `grouping_var = "Condition"`
-
-| Input | Required? | Example | Notes |
-|-------|-----------|---------|-------|
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Input                    | Required?                            | Example                       | Notes                                                                                                                                                                                                                                                  |
++==========================+======================================+===============================+========================================================================================================================================================================================================================================================+
+| `mgi`                    | Required                             | `"Tox"`                       | Must match exactly the way it's written in the MGI symbols. Check the genemap you created if you're unsure                                                                                                                                             |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| string                   |                                      |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `norm_df`                | Required                             | `rlog_df`                     | this must be the data frame version of your rlog normalized counts                                                                                                                                                                                     |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| data frame               |                                      |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `metadat`                | Required                             | `meta`                        | same metadata table used for everything                                                                                                                                                                                                                |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| dataframe                |                                      |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `plot_aes`               | Required                             | `plot_aes`                    | same aesthetics used throughout                                                                                                                                                                                                                        |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| data frame               |                                      |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `comparisons`            | Optional;                            | `list(`                       | Add as many comparisons (lists of 2 strings) as you want plotted. The line will be plotted regardless of significance but p val will only be added if its significant. The order that you write them will be the order they're plotted in (vertically) |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| list of lists of strings | defaults to an empty list            | `c("Tolerant", "Naive"),`     |                                                                                                                                                                                                                                                        |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+|                          |                                      | `c("Tolerant", "Rejecting"),` |                                                                                                                                                                                                                                                        |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+|                          |                                      | `c("Naive", "Rejecting"))`    |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `grouping_var`           | Optional;                            | `"Group"` `"Condition"` etc   | Same as previously described                                                                                                                                                                                                                           |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| string                   | defaults to `"Group"`                |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `label_samples`          | Optional;                            | `TRUE` or `FALSE`             | Change to TRUE if you would like samples labeled                                                                                                                                                                                                       |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| TRUE/FALSE               | defaults to `FALSE`                  |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `overlaps_allowed`       | Optional;                            | `10` `30` `50` etc            | This will dictate how many overlaps are tolerated when drawing the labels, make the number higher if you want to make sure more points are labeled despite being close together                                                                        |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| number                   | defaults to `10`                     |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `yaxistozero`            | Optional;                            | `TRUE` or `FALSE`             | if you set to TRUE the y axis will go all the way to 0. By default it'll zoom in around the counts with some space on either side                                                                                                                      |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| TRUE/FALSE               | defaults to `FALSE`                  |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `kw_hjust`               | Optional;                            | number 0-1                    | this dictates where the KW stat is placed, futz with it to move it where you want                                                                                                                                                                      |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| number                   | defaults to `0.5`                    |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `kw_vjust`               | Optional;                            | number 0-1                    | this dictates where the KW stat is placed, futz with it to move it where you want                                                                                                                                                                      |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| number                   | defaults to `1`                      |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `yaxis`                  | Optional;                            | any string                    | Change if you want a different Y axis label                                                                                                                                                                                                            |
+|                          |                                      |                               |                                                                                                                                                                                                                                                        |
+| string                   | defaults to `"rLog Normalized Reads` |                               |                                                                                                                                                                                                                                                        |
++--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Plot counts inputs
 
@@ -660,12 +750,6 @@ plot_genecounts("Tox", rlog_df, meta, plot_aes, comparisons = statcomps, yaxisto
     -   the Y axis is the -Log10 Adjusted P value for each gene
     -   a horizontal and vertical line will be added to the plot to indicate the threshold for significance for fold change and p value respectively
 
--   The adjusted P value threshold defaults to 0.01.
-    to change that, add `pval_cutoff = 0.005` to the function call (use any number you desire, thats just an example)
-
--   the log2 fold change threshold defaults to 2.
-    to change that add `l2fc_cutoff = 1` to the function call (again use any number you want)
-
 -   the plot will label significant genes with their MGI symbol (not all genes may be labeled if there are too many to plot without crowding the plot)
 
 -   the function takes as input:
@@ -676,28 +760,92 @@ plot_genecounts("Tox", rlog_df, meta, plot_aes, comparisons = statcomps, yaxisto
     -   *optional* change the threshold values as specified above
     -   *optional*
 
-| Input | Required? | Example | Notes |
-|-------|-----------|---------|-------|
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
-|       |           |         |       |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| Input                      | Required?                     | Example                       | Notes                                                                                                                                    |
++============================+===============================+===============================+==========================================================================================================================================+
+| `deg_df`                   | Required                      |                               | annotated but *unfiltered* results dataframe                                                                                             |
+|                            |                               |                               |                                                                                                                                          |
+| dataframe                  |                               |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `plotTitle`                | Required                      | `"Condition 1 vs 2 DEGs"`     |                                                                                                                                          |
+|                            |                               |                               |                                                                                                                                          |
+| string                     |                               |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `cond1`                    | Required                      | `"Tolerant"`                  | The first condition (numerator) in the results data frame. Must be typed how it was above                                                |
+|                            |                               |                               |                                                                                                                                          |
+| string                     |                               |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `cond2`                    | Required                      | `"Rejecting"`                 | The second condition (denominator) in the results data frame                                                                             |
+|                            |                               |                               |                                                                                                                                          |
+| string                     |                               |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `l2fc_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn & which points will be colored                                                                      |
+|                            |                               |                               |                                                                                                                                          |
+| number                     | defaults to 2                 |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `pval_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn and which points will be colored                                                                    |
+|                            |                               |                               |                                                                                                                                          |
+| number                     | defaults to 0.01              |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `dircolors`                | Optional;                     | `c("green", "red", "gray70")` | The colors for upregulated in condition 1, downregulated in condition 1 and not significant. I recommend leaving the third as `"gray70"` |
+|                            |                               |                               |                                                                                                                                          |
+| list of 3 strings (colors) | defaults to red blue and gray |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
+| `dirshapes`                | Optional;                     | `c(18, 18, 19)`               | The shapes for up in condition 1, down in condition 1 and not significant.                                                               |
+|                            |                               |                               |                                                                                                                                          |
+| list of 3 numbers (shapes) | defaults to circles           |                               |                                                                                                                                          |
++----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Volcano plots inputs
 
-```{r volcano_plots}
+```{r volcano_plots, eval=FALSE}
+analyzeRNA::volcano_plot(deg_df = one_vs_two, 
+                         plotTitle = "One vs Two", 
+                         cond1 = "One", cond2 = "Two")
+
+analyzeRNA::volcano_plot(deg_df = two_vs_three, 
+                         plotTitle = "Two vs Three", 
+                         cond1 = "Two", cond2 = "Three",
+                         l2fc_cutoff = 1.5, pval_cutoff = 0.05, 
+                         dircolors = c("green", "red", "gray70"),
+                         dirshapes = c(24, 25, 19))
+```
+
+## Gene Ontology Based Analysis
+
+[The code here was adapted from this page.](https://hbctraining.github.io/DGE_workshop/lessons/09_functional_analysis.html)
+
+Some info on GO terms generally: [GO Terms Overview website](https://geneontology.org/docs/ontology-documentation/ "Click for background info on GO terms generally"){.uri}
+
+GO terms are organized into "Biological Processes" (BP), "Molecular Functions" (MF), and "Cellular Components" (CC).
+You can do GSEA analysis on just one of these or a combination of them.
+
+These analyses will use pairwise comparison results, not the rlog normalized counts.
+
+### Over-representation Analysis
+
+```{r over_representation, eval=FALSE}
+
+```
+
+### Gene Set Enrichment Analysis (GSEA)
+
+The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color).
+This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
+
+```{r get_gsea, eval=FALSE}
+
+
 
 
 ```
 
-## Gene Set Enrichment Analysis
+```{r gsea_dotplots, eval=FALSE}
 
-The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color).
-This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
--
 
-```{r gsea}
+```
+
+```{r gsea_ridgeplots, eval=FALSE}
 
 ```
 

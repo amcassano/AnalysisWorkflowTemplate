@@ -1398,6 +1398,28 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; }
 
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 
 
@@ -1581,6 +1603,13 @@ order is not recommended.</p></li>
 <li><p>You can run all upstream chunks by clicking the button that has a
 down arrow pointing to a green bar.</p></li>
 </ul></li>
+<li><p>I’ve tried to include handy-dandy tables throughout this template
+to describe the inputs you need to provide for the functions I’ve
+written. The functions all also have R documentation attached to them.
+In R studio if you put your mouse cursor on the function name and hit F1
+it should pop up the help information for the function. Alternatively,
+click on the function name and use the toolbar. Click the ‘Code’ tab
+then find ‘Go to Help’.</p></li>
 </ul>
 <p><em>Built with R version 4.3.1. Most recent template changes made on
 September 28, 2023</em></p>
@@ -1852,19 +1881,20 @@ conditions you have. Add or remove lines from the
 conditions you have.</strong></span></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>plot_aes <span class="ot">&lt;-</span> analyzeRNA<span class="sc">::</span><span class="fu">set_aes</span>(group_labels, </span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;shape1&quot;</span>, <span class="st">&quot;shape2&quot;</span>, <span class="st">&quot;shape3&quot;</span>),</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;outline1&quot;</span>, <span class="st">&quot;outline2&quot;</span>, <span class="st">&quot;outlin3&quot;</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;outline1&quot;</span>, <span class="st">&quot;outline2&quot;</span>, <span class="st">&quot;outline3&quot;</span>),</span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;fill1&quot;</span>, <span class="st">&quot;fill2&quot;</span>, <span class="st">&quot;fill3&quot;</span>))</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>anno_colors <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">Group =</span> <span class="fu">c</span>(</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">1</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">1</span>]),</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">2</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">2</span>]),</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">3</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">3</span>]),</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">4</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">4</span>]),</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">5</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">5</span>]),</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">6</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">6</span>])</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  )</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>)             </span></code></pre></div>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co"># for heatmaps</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>anno_colors <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">Group =</span> <span class="fu">c</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">1</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">1</span>]),</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">2</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">2</span>]),</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">3</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">3</span>]),</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">4</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">4</span>]),</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">5</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">5</span>]),</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">6</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">6</span>])</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  )</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>)             </span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1917,7 +1947,9 @@ but it is more robust.</p></li>
 input for machine learning techniques such as clustering or linear
 discriminant analysis.</p></li>
 <li><p>rlog takes as input a <code>DESeqDataSet</code> and returns a
-<code>RangedSummarizedExperiment</code> object.</p></li>
+<code>RangedSummarizedExperiment</code> object. We will also save this
+same information as a data frame. We need both for various parts of code
+below.</p></li>
 <li><p><code>blind = FALSE</code> must be included in the code. This
 determines whether to blind the transformation to the experimental
 design. <code>blind=TRUE</code> should be used for comparing samples in
@@ -1944,15 +1976,16 @@ further on.</p></li>
 mitigates the effects of any single sample on the log fold change
 calculations, minimizing noise. Add <code>log2FCshrink = TRUE</code> to
 the function call if you want to use this. The calculation used is the
-“ashr” algorithm <span class="citation">[@stephens2016]</span>.</p></li>
+“ashr” algorithm (<span class="citation">Stephens
+(2016)</span>.)</p></li>
 </ul>
-<table>
+<table style="width:99%;">
 <caption>Pairwise Comparison Function Inputs</caption>
 <colgroup>
-<col width="21%" />
-<col width="21%" />
-<col width="13%" />
-<col width="42%" />
+<col width="6%" />
+<col width="8%" />
+<col width="11%" />
+<col width="73%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1964,43 +1997,57 @@ the function call if you want to use this. The calculation used is the
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>numerator</code> string</td>
+<td><p><code>numerator</code></p>
+<p>string</p></td>
 <td>Required</td>
 <td><code>&quot;Tolerant&quot;</code> <code>&quot;Naive&quot;</code> etc</td>
 <td>Must match exactly the way it’s written in the DESeq object. If
 unsure run just the <code>resultsNames(dseq)</code> line of code.</td>
 </tr>
 <tr class="even">
-<td><code>denominator</code> string</td>
+<td><p><code>denominator</code></p>
+<p>string</p></td>
 <td>Required</td>
 <td><code>&quot;Tolerant&quot;</code> <code>&quot;Naive&quot;</code> etc</td>
 <td>Must match exactly the way it’s written in the DESeq object. If
 unsure run just the <code>resultsNames(dseq)</code> line of code.</td>
 </tr>
 <tr class="odd">
-<td><code>dseq_obj</code> DESeqObject</td>
+<td><p><code>dseq_obj</code></p>
+<p>DESeqObject</p></td>
 <td>Required</td>
 <td>dseq</td>
 <td>This is the DESeq object we saved two chunks above. Don’t change the
 name of it unless you also changed the name in the above chunks.</td>
 </tr>
 <tr class="even">
-<td><code>contrast_str</code> string</td>
-<td>Optional; defaults to <code>&quot;Group&quot;</code></td>
-<td></td>
-<td></td>
+<td><p><code>contrast_str</code></p>
+<p>string</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>&quot;Group&quot;</code></p></td>
+<td><code>&quot;Group&quot;</code>, <code>&quot;Condition&quot;</code> etc</td>
+<td>This will be indicate what is the independent variable in your data.
+If you set things up as I described above it should be Group. If not,
+you may need to specify Condition or something else like that.</td>
 </tr>
 <tr class="odd">
-<td><code>tidy_result</code> TRUE/FALSE</td>
-<td>Optional; defaults to <code>TRUE</code></td>
-<td></td>
-<td></td>
+<td><p><code>tidy_result</code></p>
+<p>TRUE/FALSE</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>TRUE</code></p></td>
+<td><code>TRUE</code> or <code>FALSE</code></td>
+<td>When set to TRUE the results will output as a nice dataframe. IDK
+why you’d want to change that. Odds are you’ll leave it be</td>
 </tr>
 <tr class="even">
-<td><code>log2FCshrink</code> TRUE/FALSE</td>
-<td>Optional; defaults to <code>FALSE</code></td>
-<td></td>
-<td></td>
+<td><p><code>log2FCshrink</code></p>
+<p>TRUE/FALSE</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>FALSE</code></p></td>
+<td><code>TRUE</code> or <code>FALSE</code></td>
+<td>If you’ve got a lot of variance going on in your data you might want
+to set this to TRUE. It will do some math to handle that. I don’t
+understand the math but feel free to look it up if you care to.</td>
 </tr>
 </tbody>
 </table>
@@ -2050,13 +2097,13 @@ add more things like gene biotype)</strong></span></p>
 </div>
 <div id="annotate-pairwise-comparisons-degs" class="section level2">
 <h2>Annotate pairwise comparisons (DEGs)</h2>
-<table>
+<table style="width:99%;">
 <caption>Annotation Function Inputs</caption>
 <colgroup>
-<col width="15%" />
-<col width="15%" />
-<col width="21%" />
-<col width="47%" />
+<col width="8%" />
+<col width="16%" />
+<col width="18%" />
+<col width="55%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2068,21 +2115,26 @@ add more things like gene biotype)</strong></span></p>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>res</code> results dataframe</td>
+<td><p><code>res</code></p>
+<p>results dataframe</p></td>
 <td>Required</td>
 <td><code>rlog_df</code>, a pairwise comparison dataframe</td>
 <td>must include ‘GeneID’ column with ensembl ID</td>
 </tr>
 <tr class="even">
-<td><code>gm</code> genemap</td>
+<td><p><code>gm</code></p>
+<p>genemap</p></td>
 <td>Required</td>
 <td><code>gmap</code></td>
 <td>created using the chunk above</td>
 </tr>
 <tr class="odd">
-<td><code>gmattri</code> list of strings</td>
-<td>Optional; defaults to MGI symbol &amp; description</td>
-<td><code>c(&quot;MGI_Symbol&quot;, &quot;MGI_Desc&quot;, &quot;GeneType&quot;)</code></td>
+<td><p><code>gmattri</code></p>
+<p>list of strings</p></td>
+<td><p>Optional;</p>
+<p>defaults to MGI symbol &amp; description</p></td>
+<td><p><code>c(&quot;MGI_Symbol&quot;,</code></p>
+<p><code>&quot;MGI_Desc&quot;, &quot;GeneType&quot;)</code></p></td>
 <td>Dictates which columns from the gene map are kept after renaming and
 reordering. Can’t include a column not present in the genemap.</td>
 </tr>
@@ -2163,47 +2215,45 @@ generated</strong></span></p>
 <code>signif_deg</code> function as a csv, exporting it to the current
 working directory. The option to export just those genes that are
 up-regulated, just those that are down-regulated, or all genes is
-included</p>
-<table>
+included. <strong>Do NOT include white space in the file
+name</strong></p>
+<table style="width:99%;">
 <caption>Export DEGs function inputs</caption>
+<colgroup>
+<col width="8%" />
+<col width="11%" />
+<col width="18%" />
+<col width="59%" />
+</colgroup>
 <thead>
 <tr class="header">
-<th>Input</th>
+<th align="left">Input</th>
 <th>Required?</th>
-<th>Example</th>
+<th>Example/Options</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>tab</code></td>
+<td align="left"><code>tab</code> data frame</td>
 <td>Required</td>
-<td></td>
+<td>the annotated and filtered signficiant DEGs</td>
 <td></td>
 </tr>
 <tr class="even">
-<td><code>filename</code></td>
+<td align="left"><code>filename</code> string</td>
 <td>Required</td>
-<td></td>
-<td></td>
+<td><code>&quot;TolVsNaiveSignifDEGs&quot;</code></td>
+<td>If you are exporting just up or down the function will append up or
+down to the end of the file name. <code>&quot;.csv&quot;</code> is not needed in
+the file name.</td>
 </tr>
 <tr class="odd">
-<td><code>direction</code></td>
+<td align="left"><code>direction</code> string</td>
 <td>Optional; defaults to both</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><code>&quot;up&quot;</code>, <code>&quot;down&quot;</code>, or leave it blank</td>
+<td>if you use anything other than up or down it will export
+everything.</td>
 </tr>
 </tbody>
 </table>
@@ -2239,7 +2289,8 @@ between samples. This can be compared to what is expected by the
 experiment design. Rlog transformed data will be used for this to ensure
 that sample distance isn’t overly due to certain highly expressed
 genes.</p>
-<p><span style="color: red"><strong>Do not edit</strong></span></p>
+<p><span style="color: red"><strong>Do not edit this
+chunk</strong></span></p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>analyzeRNA<span class="sc">::</span><span class="fu">sample_distances</span>(rlog_norm, anno_colors, meta)</span></code></pre></div>
 </div>
 <div id="principal-component-analysis" class="section level2">
@@ -2273,8 +2324,14 @@ see the principal components account for ~50-60% of the total variance.
 Ideally, PC1 would account for ~30+% of the variance.</p></li>
 </ul></li>
 </ul>
-<table>
+<table style="width:99%;">
 <caption>PCA function inputs</caption>
+<colgroup>
+<col width="8%" />
+<col width="17%" />
+<col width="22%" />
+<col width="50%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Input</th>
@@ -2285,34 +2342,44 @@ Ideally, PC1 would account for ~30+% of the variance.</p></li>
 </thead>
 <tbody>
 <tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>dseq_transform</code></p>
+<p>DESeqTransform object</p></td>
+<td>Required</td>
+<td><code>rlog_norm</code></td>
+<td>you need to use the actual object and not the data frame for
+this</td>
 </tr>
 <tr class="even">
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>plot_aes</code></p>
+<p>dataframe</p></td>
+<td>Required</td>
+<td><code>plot_aes</code></td>
+<td>use the dataframe created in the set_aesthetics chunk</td>
+</tr>
+<tr class="odd">
+<td><p><code>grouping_var</code></p>
+<p>string</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>&quot;Group&quot;</code></p></td>
+<td><code>&quot;Group&quot;</code> <code>&quot;Condition&quot;</code> etc</td>
+<td>Should match the grouping variable used everywhere else</td>
+</tr>
+<tr class="even">
+<td><p><code>plot_title</code></p>
+<p>string</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>&quot;Principal Component Analysis&quot;</code></p></td>
+<td>Any title for the plot you desire. Make sure it’s in quotes.</td>
 <td></td>
 </tr>
 <tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>label_samples</code></p>
+<p>TRUE/FALSE</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>FALSE</code></p></td>
+<td><code>TRUE</code> or <code>FALSE</code></td>
+<td>Setting to True will add labels to (some of) the data points in the
+plot. Most helpful when you want to be able to identify an outlier.</td>
 </tr>
 </tbody>
 </table>
@@ -2370,37 +2437,14 @@ labels</strong></span></p>
 normalized counts. This can be done for specific genes of interest.
 Using the <code>plot_genecounts</code> function, the data can be saved
 to an object for plotting.</p>
-<p>Required Function Inputs:</p>
-<ul>
-<li>MGI symbol for the gene of interest,</li>
-<li>annotated data frame of rlog annotated counts</li>
-<li>the metadata data frame</li>
-<li>plot aesthetics.</li>
-</ul>
-<p>Optional Inputs:</p>
-<ul>
-<li>a list of comparisons to get p values for. The format for this is
-`comparisons = list(c(“condition1”, “condition2”), c(“condition2”,
-“condition3”)) adding as many comparisons as desired. The order of
-comparisons in the list will correspond to the order in which the
-pvalues are plotted on the graph.</li>
-<li>changing the y axis label using
-<code>yaxis = &quot;my custom axis label&quot;</code>. it defaults to “rLog
-Normalized Reads”</li>
-<li>labeling the samples using <code>label_samples = TRUE</code>, it
-defaults to false</li>
-<li>you can also set it so the Y axis is forced to go to 0. By default
-the Y axis will zoom in around the counts. You can change this by
-including <code>yaxistozero = TRUE</code></li>
-<li>you can change the location of the kruskal wallis statistic that
-will be included using <code>kw_hjust = yournumberhere</code> and
-<code>kw_vjust = yournumberhere</code></li>
-<li>by default the x axis will split your samples according to the Group
-variable, if there is a different name for it (i.e. condition) you can
-include <code>grouping_var = &quot;Condition&quot;</code></li>
-</ul>
-<table>
+<table style="width:99%;">
 <caption>Plot counts inputs</caption>
+<colgroup>
+<col width="7%" />
+<col width="11%" />
+<col width="9%" />
+<col width="71%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Input</th>
@@ -2411,34 +2455,109 @@ include <code>grouping_var = &quot;Condition&quot;</code></li>
 </thead>
 <tbody>
 <tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>mgi</code></p>
+<p>string</p></td>
+<td>Required</td>
+<td><code>&quot;Tox&quot;</code></td>
+<td>Must match exactly the way it’s written in the MGI symbols. Check
+the genemap you created if you’re unsure</td>
 </tr>
 <tr class="even">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>norm_df</code></p>
+<p>data frame</p></td>
+<td>Required</td>
+<td><code>rlog_df</code></td>
+<td>this must be the data frame version of your rlog normalized
+counts</td>
 </tr>
 <tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>metadat</code></p>
+<p>dataframe</p></td>
+<td>Required</td>
+<td><code>meta</code></td>
+<td>same metadata table used for everything</td>
 </tr>
 <tr class="even">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>plot_aes</code></p>
+<p>data frame</p></td>
+<td>Required</td>
+<td><code>plot_aes</code></td>
+<td>same aesthetics used throughout</td>
 </tr>
 <tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>comparisons</code></p>
+<p>list of lists of strings</p></td>
+<td><p>Optional;</p>
+<p>defaults to an empty list</p></td>
+<td><p><code>list(</code></p>
+<p><code>c(&quot;Tolerant&quot;, &quot;Naive&quot;),</code></p>
+<p><code>c(&quot;Tolerant&quot;, &quot;Rejecting&quot;),</code></p>
+<p><code>c(&quot;Naive&quot;, &quot;Rejecting&quot;))</code></p></td>
+<td>Add as many comparisons (lists of 2 strings) as you want plotted.
+The line will be plotted regardless of significance but p val will only
+be added if its significant. The order that you write them will be the
+order they’re plotted in (vertically)</td>
+</tr>
+<tr class="even">
+<td><p><code>grouping_var</code></p>
+<p>string</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>&quot;Group&quot;</code></p></td>
+<td><code>&quot;Group&quot;</code> <code>&quot;Condition&quot;</code> etc</td>
+<td>Same as previously described</td>
+</tr>
+<tr class="odd">
+<td><p><code>label_samples</code></p>
+<p>TRUE/FALSE</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>FALSE</code></p></td>
+<td><code>TRUE</code> or <code>FALSE</code></td>
+<td>Change to TRUE if you would like samples labeled</td>
+</tr>
+<tr class="even">
+<td><p><code>overlaps_allowed</code></p>
+<p>number</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>10</code></p></td>
+<td><code>10</code> <code>30</code> <code>50</code> etc</td>
+<td>This will dictate how many overlaps are tolerated when drawing the
+labels, make the number higher if you want to make sure more points are
+labeled despite being close together</td>
+</tr>
+<tr class="odd">
+<td><p><code>yaxistozero</code></p>
+<p>TRUE/FALSE</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>FALSE</code></p></td>
+<td><code>TRUE</code> or <code>FALSE</code></td>
+<td>if you set to TRUE the y axis will go all the way to 0. By default
+it’ll zoom in around the counts with some space on either side</td>
+</tr>
+<tr class="even">
+<td><p><code>kw_hjust</code></p>
+<p>number</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>0.5</code></p></td>
+<td>number 0-1</td>
+<td>this dictates where the KW stat is placed, futz with it to move it
+where you want</td>
+</tr>
+<tr class="odd">
+<td><p><code>kw_vjust</code></p>
+<p>number</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>1</code></p></td>
+<td>number 0-1</td>
+<td>this dictates where the KW stat is placed, futz with it to move it
+where you want</td>
+</tr>
+<tr class="even">
+<td><p><code>yaxis</code></p>
+<p>string</p></td>
+<td><p>Optional;</p>
+<p>defaults to <code>&quot;rLog Normalized Reads</code></p></td>
+<td>any string</td>
+<td>Change if you want a different Y axis label</td>
 </tr>
 </tbody>
 </table>
@@ -2463,12 +2582,6 @@ gene</li>
 the threshold for significance for fold change and p value
 respectively</li>
 </ul></li>
-<li><p>The adjusted P value threshold defaults to 0.01. to change that,
-add <code>pval_cutoff = 0.005</code> to the function call (use any
-number you desire, thats just an example)</p></li>
-<li><p>the log2 fold change threshold defaults to 2. to change that add
-<code>l2fc_cutoff = 1</code> to the function call (again use any number
-you want)</p></li>
 <li><p>the plot will label significant genes with their MGI symbol (not
 all genes may be labeled if there are too many to plot without crowding
 the plot)</p></li>
@@ -2486,8 +2599,14 @@ above</li>
 <li><em>optional</em></li>
 </ul></li>
 </ul>
-<table>
+<table style="width:99%;">
 <caption>Volcano plots inputs</caption>
+<colgroup>
+<col width="12%" />
+<col width="13%" />
+<col width="13%" />
+<col width="59%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Input</th>
@@ -2498,44 +2617,105 @@ above</li>
 </thead>
 <tbody>
 <tr class="odd">
+<td><p><code>deg_df</code></p>
+<p>dataframe</p></td>
+<td>Required</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>annotated but <em>unfiltered</em> results dataframe</td>
 </tr>
 <tr class="even">
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>plotTitle</code></p>
+<p>string</p></td>
+<td>Required</td>
+<td><code>&quot;Condition 1 vs 2 DEGs&quot;</code></td>
 <td></td>
 </tr>
 <tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>cond1</code></p>
+<p>string</p></td>
+<td>Required</td>
+<td><code>&quot;Tolerant&quot;</code></td>
+<td>The first condition (numerator) in the results data frame. Must be
+typed how it was above</td>
 </tr>
 <tr class="even">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p><code>cond2</code></p>
+<p>string</p></td>
+<td>Required</td>
+<td><code>&quot;Rejecting&quot;</code></td>
+<td>The second condition (denominator) in the results data frame</td>
 </tr>
 <tr class="odd">
+<td><p><code>l2fc_cutoff</code></p>
+<p>number</p></td>
+<td><p>Optional;</p>
+<p>defaults to 2</p></td>
 <td></td>
+<td>where the cutoff lines will be drawn &amp; which points will be
+colored</td>
+</tr>
+<tr class="even">
+<td><p><code>pval_cutoff</code></p>
+<p>number</p></td>
+<td><p>Optional;</p>
+<p>defaults to 0.01</p></td>
 <td></td>
-<td></td>
-<td></td>
+<td>where the cutoff lines will be drawn and which points will be
+colored</td>
+</tr>
+<tr class="odd">
+<td><p><code>dircolors</code></p>
+<p>list of 3 strings (colors)</p></td>
+<td><p>Optional;</p>
+<p>defaults to red blue and gray</p></td>
+<td><code>c(&quot;green&quot;, &quot;red&quot;, &quot;gray70&quot;)</code></td>
+<td>The colors for upregulated in condition 1, downregulated in
+condition 1 and not significant. I recommend leaving the third as
+<code>&quot;gray70&quot;</code></td>
+</tr>
+<tr class="even">
+<td><p><code>dirshapes</code></p>
+<p>list of 3 numbers (shapes)</p></td>
+<td><p>Optional;</p>
+<p>defaults to circles</p></td>
+<td><code>c(18, 18, 19)</code></td>
+<td>The shapes for up in condition 1, down in condition 1 and not
+significant.</td>
 </tr>
 </tbody>
 </table>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>analyzeRNA<span class="sc">::</span><span class="fu">volcano_plot</span>(<span class="at">deg_df =</span> one_vs_two, </span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>                         <span class="at">plotTitle =</span> <span class="st">&quot;One vs Two&quot;</span>, </span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>                         <span class="at">cond1 =</span> <span class="st">&quot;One&quot;</span>, <span class="at">cond2 =</span> <span class="st">&quot;Two&quot;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>analyzeRNA<span class="sc">::</span><span class="fu">volcano_plot</span>(<span class="at">deg_df =</span> two_vs_three, </span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>                         <span class="at">plotTitle =</span> <span class="st">&quot;Two vs Three&quot;</span>, </span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>                         <span class="at">cond1 =</span> <span class="st">&quot;Two&quot;</span>, <span class="at">cond2 =</span> <span class="st">&quot;Three&quot;</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>                         <span class="at">l2fc_cutoff =</span> <span class="fl">1.5</span>, <span class="at">pval_cutoff =</span> <span class="fl">0.05</span>, </span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>                         <span class="at">dircolors =</span> <span class="fu">c</span>(<span class="st">&quot;green&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;gray70&quot;</span>),</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>                         <span class="at">dirshapes =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">25</span>, <span class="dv">19</span>))</span></code></pre></div>
 </div>
-<div id="gene-set-enrichment-analysis" class="section level2">
-<h2>Gene Set Enrichment Analysis</h2>
+<div id="gene-ontology-based-analysis" class="section level2">
+<h2>Gene Ontology Based Analysis</h2>
+<p><a href="https://hbctraining.github.io/DGE_workshop/lessons/09_functional_analysis.html">The
+code here was adapted from this page.</a></p>
+<p>Some info on GO terms generally: <a href="https://geneontology.org/docs/ontology-documentation/" class="uri" title="Click for background info on GO terms generally">GO Terms
+Overview website</a></p>
+<p>GO terms are organized into “Biological Processes” (BP), “Molecular
+Functions” (MF), and “Cellular Components” (CC). You can do GSEA
+analysis on just one of these or a combination of them.</p>
+<p>These analyses will use pairwise comparison results, not the rlog
+normalized counts.</p>
+<div id="over-representation-analysis" class="section level3">
+<h3>Over-representation Analysis</h3>
+</div>
+<div id="gene-set-enrichment-analysis-gsea" class="section level3">
+<h3>Gene Set Enrichment Analysis (GSEA)</h3>
 <p>The dotplot shows the number of genes associated with the first 50
 terms (size) and the p-adjusted values for these terms (color). This
 plot displays the top 50 genes by gene ratio (# genes related to GO term
-/ total number of sig genes), not p-adjusted value. -</p>
+/ total number of sig genes), not p-adjusted value.</p>
+</div>
 </div>
 <div id="heatmaps" class="section level2">
 <h2>Heatmaps</h2>
@@ -2547,8 +2727,14 @@ GSEA</p>
 <div id="shared-genes" class="section level3">
 <h3>Shared Genes</h3>
 </div>
-<div id="venndiagram" class="section level3">
-<h3>VennDiagram</h3>
+<div id="venndiagram" class="section level3 unnumbered">
+<h3 class="unnumbered">VennDiagram</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-stephens2016" class="csl-entry">
+Stephens, Matthew. 2016. <span>“False Discovery Rates: A New
+Deal.”</span> <em>Biostatistics</em>, October, kxw041. <a href="https://doi.org/10.1093/biostatistics/kxw041">https://doi.org/10.1093/biostatistics/kxw041</a>.
+</div>
+</div>
 </div>
 </div>
 </div>
