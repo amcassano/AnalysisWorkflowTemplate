@@ -76,6 +76,7 @@ BiocManager::install(c("DESeq2",
                        "GenomicRanges",
                        "Repitools",
                        "clusterProfiler",
+                       "org.Mm.eg.db"
                        "DOSE",
                        "pathview",
                        "treemap",
@@ -98,6 +99,7 @@ Leave this chunk as `eval=TRUE`
 library(devtools)
 library(roxygen2)
 library(tidyverse)
+library(org.Mm.eg.db)
 library(utils) 
 library(stringi)
 library(stringr)
@@ -496,11 +498,11 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df, gmap)
     -   `Change Metric` is also added to each gene and the resultant data frame will be sorted according to this.
         The metric is calculated as $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$.
 
-| Input                        | Required?                  |
-|------------------------------|----------------------------|
-| `result` annotated dataframe | Required                   |
-| `padj_cutoff` number         | Optional; defaults to 0.05 |
-| `l2fc_cutoff` number         | Optional; defaults to 0.8  |
+| Input                        | Required?                                           |
+|------------------------------|-----------------------------------------------------|
+| `result` annotated dataframe | Required                                            |
+| `padj_cutoff` number         | Optional; defaults to 0.05                          |
+| `l2fc_cutoff` number         | Optional; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC) |
 
 : Filter DEGs function inputs
 
@@ -524,15 +526,11 @@ The `export_genelist` function will save the output of the `signif_deg` function
 The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included.
 **Do NOT include white space in the file name**
 
-+--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | Input              | Required?                  | Example/Options                             | Notes                                                                                                                                          |
-+:===================+============================+=============================================+================================================================================================================================================+
+|:-------------------|----------------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | `tab` data frame   | Required                   | the annotated and filtered signficiant DEGs |                                                                                                                                                |
-+--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | `filename` string  | Required                   | `"TolVsNaiveSignifDEGs"`                    | If you are exporting just up or down the function will append up or down to the end of the file name. `".csv"` is not needed in the file name. |
-+--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | `direction` string | Optional; defaults to both | `"up"`, `"down"`, or leave it blank         | if you use anything other than up or down it will export everything.                                                                           |
-+--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Export DEGs function inputs
 
@@ -781,7 +779,7 @@ plot_genecounts("Tox", rlog_df, meta, plot_aes, comparisons = statcomps, yaxisto
 +----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
 | `l2fc_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn & which points will be colored                                                                      |
 |                            |                               |                               |                                                                                                                                          |
-| number                     | defaults to 2                 |                               |                                                                                                                                          |
+| number                     | defaults to 1                 |                               |                                                                                                                                          |
 +----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
 | `pval_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn and which points will be colored                                                                    |
 |                            |                               |                               |                                                                                                                                          |

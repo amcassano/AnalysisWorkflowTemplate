@@ -1649,12 +1649,13 @@ run chunk button if needed)</strong></span></p>
 <span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>                       <span class="st">&quot;GenomicRanges&quot;</span>,</span>
 <span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>                       <span class="st">&quot;Repitools&quot;</span>,</span>
 <span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>                       <span class="st">&quot;clusterProfiler&quot;</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>                       <span class="st">&quot;DOSE&quot;</span>,</span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>                       <span class="st">&quot;pathview&quot;</span>,</span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>                       <span class="st">&quot;treemap&quot;</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>                       <span class="st">&quot;biomaRt&quot;</span>,</span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>                       <span class="st">&quot;ashr&quot;</span>))</span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;enrichplot&quot;</span>)</span></code></pre></div>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>                       <span class="st">&quot;org.Mm.eg.db&quot;</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>                       <span class="st">&quot;DOSE&quot;</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>                       <span class="st">&quot;pathview&quot;</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>                       <span class="st">&quot;treemap&quot;</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>                       <span class="st">&quot;biomaRt&quot;</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>                       <span class="st">&quot;ashr&quot;</span>))</span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;enrichplot&quot;</span>)</span></code></pre></div>
 </div>
 <div id="load-packages" class="section level2">
 <h2>Load packages</h2>
@@ -1667,37 +1668,38 @@ chunk</strong></span></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(roxygen2)</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(utils) </span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">library</span>(biomaRt) </span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">library</span>(DESeq2) </span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">library</span>(ashr)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="fu">library</span>(uwot)</span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="fu">library</span>(ggVennDiagram)</span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="fu">library</span>(tinytex)</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="fu">library</span>(stats)</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="fu">library</span>(enrichplot)</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="fu">library</span>(DOSE)</span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(devtools)) { <span class="fu">install.packages</span>(<span class="st">&#39;devtools&#39;</span>) }</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;JamesJoly/DGSEA&#39;</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;amcassano/RNAseqAnalysisPackage&#39;</span>) </span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="fu">library</span>(DGSEA)</span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="fu">library</span>(analyzeRNA) <span class="co">#arguably the most important line of code, this imports all the code I wrote</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="fu">library</span>(org.Mm.eg.db)</span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="fu">library</span>(treemap)</span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="fu">library</span>(pathview)</span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="fu">library</span>(SPIA)</span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(org.Mm.eg.db)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(utils) </span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">library</span>(biomaRt) </span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">library</span>(DESeq2) </span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">library</span>(ashr)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="fu">library</span>(uwot)</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="fu">library</span>(ggVennDiagram)</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="fu">library</span>(tinytex)</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="fu">library</span>(stats)</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="fu">library</span>(enrichplot)</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="fu">library</span>(DOSE)</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(devtools)) { <span class="fu">install.packages</span>(<span class="st">&#39;devtools&#39;</span>) }</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;JamesJoly/DGSEA&#39;</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;amcassano/RNAseqAnalysisPackage&#39;</span>) </span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="fu">library</span>(DGSEA)</span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="fu">library</span>(analyzeRNA) <span class="co">#arguably the most important line of code, this imports all the code I wrote</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="fu">library</span>(org.Mm.eg.db)</span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="fu">library</span>(treemap)</span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="fu">library</span>(pathview)</span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="fu">library</span>(SPIA)</span></code></pre></div>
 </div>
 <div id="set-working-directory" class="section level2">
 <h2>Set working directory</h2>
@@ -2177,6 +2179,10 @@ value)\)</span>.</p></li>
 </ul>
 <table>
 <caption>Filter DEGs function inputs</caption>
+<colgroup>
+<col width="36%" />
+<col width="63%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Input</th>
@@ -2194,7 +2200,7 @@ value)\)</span>.</p></li>
 </tr>
 <tr class="odd">
 <td><code>l2fc_cutoff</code> number</td>
-<td>Optional; defaults to 0.8</td>
+<td>Optional; defaults to 0.8 (0.8 Log2 FC = ~1.74 FC)</td>
 </tr>
 </tbody>
 </table>
@@ -2217,13 +2223,13 @@ working directory. The option to export just those genes that are
 up-regulated, just those that are down-regulated, or all genes is
 included. <strong>Do NOT include white space in the file
 name</strong></p>
-<table style="width:99%;">
+<table>
 <caption>Export DEGs function inputs</caption>
 <colgroup>
 <col width="8%" />
 <col width="11%" />
 <col width="18%" />
-<col width="59%" />
+<col width="60%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2649,7 +2655,7 @@ typed how it was above</td>
 <td><p><code>l2fc_cutoff</code></p>
 <p>number</p></td>
 <td><p>Optional;</p>
-<p>defaults to 2</p></td>
+<p>defaults to 1</p></td>
 <td></td>
 <td>where the cutoff lines will be drawn &amp; which points will be
 colored</td>
