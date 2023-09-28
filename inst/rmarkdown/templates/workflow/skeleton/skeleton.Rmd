@@ -126,7 +126,6 @@ devtools::install_github('amcassano/RNAseqAnalysisPackage')
 library(DGSEA)
 library(analyzeRNA) #arguably the most important line of code, this imports all the code I wrote
 library(org.Mm.eg.db)
-library(ggridges)
 library(ggpubr)
 library(treemap)
 library(pathview)
@@ -156,6 +155,10 @@ Your working directory should contain:
 # set working directory
 cwd <- "parentfolder/childfolder/yourfolder"
 setwd(cwd)
+
+
+# Warning: The working directory was changed to C:/Users/Lexi Cassano/Documents/GitHub/PackageTesting inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.
+#FIX THIS
 ```
 
 ## Data import & preparation
@@ -307,12 +310,12 @@ plot_aes <- analyzeRNA::set_aes(group_labels,
 # for heatmaps
 anno_colors <- list(
   Group = c(
-    as.character(plot_aes$labels[1]) = as.character(plot_aes$outlineID[1]),
-    as.character(plot_aes$labels[2]) = as.character(plot_aes$outlineID[2]),
-    as.character(plot_aes$labels[3]) = as.character(plot_aes$outlineID[3]),
-    as.character(plot_aes$labels[4]) = as.character(plot_aes$outlineID[4]),
-    as.character(plot_aes$labels[5]) = as.character(plot_aes$outlineID[5]),
-    as.character(plot_aes$labels[6]) = as.character(plot_aes$outlineID[6])
+    group1 = as.character(plot_aes$outlineID[1]),
+    group2 = as.character(plot_aes$outlineID[2]),
+    group3 = as.character(plot_aes$outlineID[3]),
+    group4 = as.character(plot_aes$outlineID[4]),
+    group5 = as.character(plot_aes$outlineID[5]),
+    group6 = as.character(plot_aes$outlineID[6])
   )
 )             
 ```
@@ -498,11 +501,15 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df, gmap)
     -   `Change Metric` is also added to each gene and the resultant data frame will be sorted according to this.
         The metric is calculated as $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$.
 
++------------------------------+-----------------------------------------------------+
 | Input                        | Required?                                           |
-|------------------------------|-----------------------------------------------------|
++==============================+=====================================================+
 | `result` annotated dataframe | Required                                            |
++------------------------------+-----------------------------------------------------+
 | `padj_cutoff` number         | Optional; defaults to 0.05                          |
++------------------------------+-----------------------------------------------------+
 | `l2fc_cutoff` number         | Optional; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC) |
++------------------------------+-----------------------------------------------------+
 
 : Filter DEGs function inputs
 
@@ -526,11 +533,15 @@ The `export_genelist` function will save the output of the `signif_deg` function
 The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included.
 **Do NOT include white space in the file name**
 
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | Input              | Required?                  | Example/Options                             | Notes                                                                                                                                          |
-|:-------------------|----------------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
++:===================+============================+=============================================+================================================================================================================================================+
 | `tab` data frame   | Required                   | the annotated and filtered signficiant DEGs |                                                                                                                                                |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | `filename` string  | Required                   | `"TolVsNaiveSignifDEGs"`                    | If you are exporting just up or down the function will append up or down to the end of the file name. `".csv"` is not needed in the file name. |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | `direction` string | Optional; defaults to both | `"up"`, `"down"`, or leave it blank         | if you use anything other than up or down it will export everything.                                                                           |
++--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Export DEGs function inputs
 
@@ -604,10 +615,6 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 | `plot_aes`            | Required                                     | `plot_aes`                                                   | use the dataframe created in the set_aesthetics chunk                                                                                   |
 |                       |                                              |                                                              |                                                                                                                                         |
 | dataframe             |                                              |                                                              |                                                                                                                                         |
-+-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
-| `grouping_var`        | Optional;                                    | `"Group"` `"Condition"` etc                                  | Should match the grouping variable used everywhere else                                                                                 |
-|                       |                                              |                                                              |                                                                                                                                         |
-| string                | defaults to `"Group"`                        |                                                              |                                                                                                                                         |
 +-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
 | `plot_title`          | Optional;                                    | Any title for the plot you desire. Make sure it's in quotes. |                                                                                                                                         |
 |                       |                                              |                                                              |                                                                                                                                         |
@@ -696,10 +703,6 @@ Using the `plot_genecounts` function, the data can be saved to an object for plo
 |                          |                                      | `c("Tolerant", "Rejecting"),` |                                                                                                                                                                                                                                                        |
 |                          |                                      |                               |                                                                                                                                                                                                                                                        |
 |                          |                                      | `c("Naive", "Rejecting"))`    |                                                                                                                                                                                                                                                        |
-+--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `grouping_var`           | Optional;                            | `"Group"` `"Condition"` etc   | Same as previously described                                                                                                                                                                                                                           |
-|                          |                                      |                               |                                                                                                                                                                                                                                                        |
-| string                   | defaults to `"Group"`                |                               |                                                                                                                                                                                                                                                        |
 +--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `label_samples`          | Optional;                            | `TRUE` or `FALSE`             | Change to TRUE if you would like samples labeled                                                                                                                                                                                                       |
 |                          |                                      |                               |                                                                                                                                                                                                                                                        |

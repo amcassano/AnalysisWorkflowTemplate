@@ -1695,11 +1695,10 @@ chunk</strong></span></p>
 <span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="fu">library</span>(DGSEA)</span>
 <span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="fu">library</span>(analyzeRNA) <span class="co">#arguably the most important line of code, this imports all the code I wrote</span></span>
 <span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="fu">library</span>(org.Mm.eg.db)</span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="fu">library</span>(treemap)</span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="fu">library</span>(pathview)</span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="fu">library</span>(SPIA)</span></code></pre></div>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="fu">library</span>(treemap)</span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="fu">library</span>(pathview)</span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="fu">library</span>(SPIA)</span></code></pre></div>
 </div>
 <div id="set-working-directory" class="section level2">
 <h2>Set working directory</h2>
@@ -1720,7 +1719,11 @@ complete path. The path should end with the name of the folder, you
 should omit the trailing ‘/’</strong></span></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># set working directory</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>cwd <span class="ot">&lt;-</span> <span class="st">&quot;parentfolder/childfolder/yourfolder&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">setwd</span>(cwd)</span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">setwd</span>(cwd)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># Warning: The working directory was changed to C:/Users/Lexi Cassano/Documents/GitHub/PackageTesting inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#FIX THIS</span></span></code></pre></div>
 </div>
 <div id="data-import-preparation" class="section level2">
 <h2>Data import &amp; preparation</h2>
@@ -1889,12 +1892,12 @@ conditions you have.</strong></span></p>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co"># for heatmaps</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>anno_colors <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">Group =</span> <span class="fu">c</span>(</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">1</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">1</span>]),</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">2</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">2</span>]),</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">3</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">3</span>]),</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">4</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">4</span>]),</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">5</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">5</span>]),</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>labels[<span class="dv">6</span>]) <span class="ot">=</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">6</span>])</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">group1 =</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">1</span>]),</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="at">group2 =</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">2</span>]),</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">group3 =</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">3</span>]),</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="at">group4 =</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">4</span>]),</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="at">group5 =</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">5</span>]),</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">group6 =</span> <span class="fu">as.character</span>(plot_aes<span class="sc">$</span>outlineID[<span class="dv">6</span>])</span>
 <span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  )</span>
 <span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>)             </span></code></pre></div>
 <hr />
@@ -2223,13 +2226,13 @@ working directory. The option to export just those genes that are
 up-regulated, just those that are down-regulated, or all genes is
 included. <strong>Do NOT include white space in the file
 name</strong></p>
-<table>
+<table style="width:99%;">
 <caption>Export DEGs function inputs</caption>
 <colgroup>
 <col width="8%" />
 <col width="11%" />
 <col width="18%" />
-<col width="60%" />
+<col width="59%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2363,14 +2366,6 @@ this</td>
 <td>use the dataframe created in the set_aesthetics chunk</td>
 </tr>
 <tr class="odd">
-<td><p><code>grouping_var</code></p>
-<p>string</p></td>
-<td><p>Optional;</p>
-<p>defaults to <code>&quot;Group&quot;</code></p></td>
-<td><code>&quot;Group&quot;</code> <code>&quot;Condition&quot;</code> etc</td>
-<td>Should match the grouping variable used everywhere else</td>
-</tr>
-<tr class="even">
 <td><p><code>plot_title</code></p>
 <p>string</p></td>
 <td><p>Optional;</p>
@@ -2378,7 +2373,7 @@ this</td>
 <td>Any title for the plot you desire. Make sure it’s in quotes.</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><p><code>label_samples</code></p>
 <p>TRUE/FALSE</p></td>
 <td><p>Optional;</p>
@@ -2505,14 +2500,6 @@ be added if its significant. The order that you write them will be the
 order they’re plotted in (vertically)</td>
 </tr>
 <tr class="even">
-<td><p><code>grouping_var</code></p>
-<p>string</p></td>
-<td><p>Optional;</p>
-<p>defaults to <code>&quot;Group&quot;</code></p></td>
-<td><code>&quot;Group&quot;</code> <code>&quot;Condition&quot;</code> etc</td>
-<td>Same as previously described</td>
-</tr>
-<tr class="odd">
 <td><p><code>label_samples</code></p>
 <p>TRUE/FALSE</p></td>
 <td><p>Optional;</p>
@@ -2520,7 +2507,7 @@ order they’re plotted in (vertically)</td>
 <td><code>TRUE</code> or <code>FALSE</code></td>
 <td>Change to TRUE if you would like samples labeled</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><p><code>overlaps_allowed</code></p>
 <p>number</p></td>
 <td><p>Optional;</p>
@@ -2530,7 +2517,7 @@ order they’re plotted in (vertically)</td>
 labels, make the number higher if you want to make sure more points are
 labeled despite being close together</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><p><code>yaxistozero</code></p>
 <p>TRUE/FALSE</p></td>
 <td><p>Optional;</p>
@@ -2539,7 +2526,7 @@ labeled despite being close together</td>
 <td>if you set to TRUE the y axis will go all the way to 0. By default
 it’ll zoom in around the counts with some space on either side</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><p><code>kw_hjust</code></p>
 <p>number</p></td>
 <td><p>Optional;</p>
@@ -2548,7 +2535,7 @@ it’ll zoom in around the counts with some space on either side</td>
 <td>this dictates where the KW stat is placed, futz with it to move it
 where you want</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><p><code>kw_vjust</code></p>
 <p>number</p></td>
 <td><p>Optional;</p>
@@ -2557,7 +2544,7 @@ where you want</td>
 <td>this dictates where the KW stat is placed, futz with it to move it
 where you want</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><p><code>yaxis</code></p>
 <p>string</p></td>
 <td><p>Optional;</p>
