@@ -1010,7 +1010,7 @@ You can also take the top x number of significantly changed genes in some compar
 
 oxphos_heatmap <- heatmapFromCSV(plottitle = "Oxidative Phosphorlyation Genes",
                                  fname = paste(cwd, "oxphos.csv", sep = "/"),
-                                 met = metadata,
+                                 met = meta,
                                  counts_df = rlog_df,
                                  annocolors = anno_colors,
                                  clusterRows = TRUE, #defaults to TRUE
@@ -1032,7 +1032,7 @@ cellprolif <- consolidate_gene_list(map = gmap,
 
 prolif_heatmap <- heatmapFromDF(plottitle = "Cell Division and Proliferation",
                                 genelist = cellprolif,
-                                met = metadata,
+                                met = meta,
                                 counts_df = rlog_df,
                                 annocolors = anno_colors,
                                 clusterRows = TRUE, #defaults to TRUE
@@ -1042,15 +1042,22 @@ prolif_heatmap <- heatmapFromDF(plottitle = "Cell Division and Proliferation",
 prolif_heatmap
 ```
 
-## Shared Genes
+### Heatmap from some top genes
 
-```{r shared_degs}
+```{r df_heatmap, eval=TRUE}
+#first grab the top however many genes from your comparisons
+# below shows how to get the top genes from 2 different comparisons together. 
+#you can add or subtract depending on your comparisons
+top_genes <- rbind(
+  dplyr::slice_head(ranked_OneTwo, n = 15) %>% select(MGI_Symbol),
+  dplyr::slice_head(ranked_TwoThree, n = 15) %>% select(MGI_Symbol)
+)
+top_genes <- dplyr::distinct(top_genes, MGI_Symbol, .keep_all = TRUE)
 
-
-```
-
-## VennDiagram
-
-```{r deg_venndiagram}
+top_heatmap <- heatmapFromDF(plottitle = "Top 15 genes from each comparison",
+                             genelist = top_genes,
+                             met = meta,
+                             counts_df = rlog_df,
+                             annocolors = anno_colors)
 
 ```
