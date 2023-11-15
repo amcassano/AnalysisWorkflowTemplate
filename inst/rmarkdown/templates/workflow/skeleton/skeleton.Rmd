@@ -95,7 +95,7 @@ Leave this chunk as `eval=TRUE`
 
 [**Do not edit this chunk**]{style="color: red"}
 
-```{r load_pkgs, eval=FALSE}
+```{r load_pkgs, eval=TRUE}
 library(devtools)
 library(roxygen2)
 library(tidyverse)
@@ -129,7 +129,6 @@ library(org.Mm.eg.db)
 library(ggpubr)
 library(treemap)
 library(pathview)
-library(SPIA)
 
 
 ```
@@ -151,14 +150,10 @@ Your working directory should contain:
 
 [**Change the working directory variable (change what is in the quotes) You will need to use the complete path. The path should end with the name of the folder, you should omit the trailing '/'**]{style="color: red"}
 
-```{r workingdirectory, eval=FALSE}
+```{r workingdirectory, eval=TRUE}
 # set working directory
 cwd <- "parentfolder/childfolder/yourfolder"
-setwd(cwd)
 
-
-# Warning: The working directory was changed to C:/Users/Lexi Cassano/Documents/GitHub/PackageTesting inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.
-#FIX THIS
 ```
 
 ## Data import & preparation
@@ -184,11 +179,11 @@ setwd(cwd)
     This is done to filter out genes that have a high read count for just one sample, but are not expressed in other samples.
     These filtering steps minimize noise and remove outliers.
 
-*Avoid using spaces or other white space in the names of your files, use '\_' or CamelCase to separate words instead. Your file names must exactly match what you type below. Be sure to include the `.csv` file extension.*
+*Avoid using spaces, dashes, or other white space in the names of your files, use '\_' or CamelCase to separate words instead. Your file names must exactly match what you type below. Be sure to include the `.csv` file extension.*
 
 [**Change`countsCSV` and `metadataCSV` file names**]{style="color: red"}
 
-```{r import_data, eval=FALSE}
+```{r import_data, eval=TRUE}
 # import files
 countsCSV <- "yourcountsfile.csv"
 countsCSV <- paste(cwd, countsCSV, sep = "/")
@@ -209,7 +204,7 @@ This code will accomplish a few things in order to get the files in the format n
 
     -   Replace whats in quotes with the names of your groups (add or remove lines as necessary). The contents of the `""` must *exactly* match the group as it is written in your metadata csv file. The order they appear is the order your groups will appear in plots and legends so fill in accordingly
 
-3.  Apply pre-filtering to your data to retain only rows that have more than minimum counts across all samples and have a total count that is less than a user defined value, when the single max count is subtracted are removed.
+3.  Apply pre-filtering to your data to retain only rows that have more than minimum counts across all samples.
     The more samples you have, the higher the number should be, the fewer samples you have the lower the number should be.
     It makes sense to set the number 300-1000.
     This is done to filter out genes that have a high read count for just one sample, but are not expressed in other samples.
@@ -217,7 +212,7 @@ This code will accomplish a few things in order to get the files in the format n
 
 [**Change the group names, count minimum, number of samples**]{style="color: red"}
 
-```{r csv_cleanup, eval=FALSE}
+```{r csv_cleanup, eval=TRUE}
 # renames each row as the GeneID and removes the Geneid column
 rownames(raw_counts) <- raw_counts$Geneid
 raw_counts <-  dplyr::select(raw_counts, -Geneid)
@@ -232,13 +227,12 @@ meta$Group <- factor(meta$Group,
                                     "group6"))
 
 # pre-filtering
-count_minimum <- 1000 
+count_minimum <- 800 
 numberofsamples <- 20
-raw_counts$row_max <- apply(raw_counts[,1:numberofsamples], 1, max)
-raw_counts$row_sum <- apply(raw_counts[,1:numberofsamples], 1, sum)
+raw_counts$row_sum <- apply(raw_counts, 1, sum)
 raw_counts <- raw_counts %>%
-  dplyr::filter((raw_counts$row_sum - raw_counts$row_max) > count_minimum) %>%
-  dplyr::select(-c(row_max, row_sum))
+  dplyr::filter(row_sum > count_minimum) %>%
+  dplyr::select(-c(row_sum))
 
 # set the sample ID as the row name for the metadata 
 rownames(meta) <- meta$SampleID
@@ -291,7 +285,7 @@ meta$Group <- factor(meta$Group,
 
 [**Do not edit this chunk, just run it.**]{style="color: red"}
 
-```{r global_aesthetics, eval=FALSE}
+```{r global_aesthetics, eval=TRUE}
 # get the names of the groups to assign to the colors/shapes
 sample_labels <- (meta$Group)
 group_labels <- unique(sample_labels) %>% sort() %>% print()
@@ -301,13 +295,13 @@ analyzeRNA::getPalettes()
 
 [**Change the colors and shapes. Make sure that the number of arguments provided match the number of conditions you have. Add or remove lines from the `anno_colors` in the below format for the number of different conditions you have.**]{style="color: red"}
 
-```{r set_aesthetics, eval=FALSE}
+```{r set_aesthetics, eval=TRUE}
 plot_aes <- analyzeRNA::set_aes(group_labels, 
                     c("shape1", "shape2", "shape3"),
                     c("outline1", "outline2", "outline3"),
                     c("fill1", "fill2", "fill3"))
 
-# for heatmaps
+# for heatmaps - be sure to change group1 group2 etc to the names of your conditions
 anno_colors <- list(
   Group = c(
     group1 = as.character(plot_aes$outlineID[1]),
@@ -343,7 +337,7 @@ Differential gene expression requires pairwise comparisons, however analysis usi
 
 [**Only change this chunk if you need to change the experiment design**]{style="color: red"}
 
-```{r DESeq2, eval=FALSE}
+```{r DESeq2, eval=TRUE}
 dseq <- analyzeRNA::getDESeq(raw_counts, meta, ~Group)
 ```
 
@@ -370,7 +364,7 @@ dseq <- analyzeRNA::getDESeq(raw_counts, meta, ~Group)
 
 [**Do not edit this chunk**]{style="color: red"}
 
-```{r rlog_normalization, eval=FALSE}
+```{r rlog_normalization, eval=TRUE}
 rlog_norm <- DESeq2::rlog(dseq, blind = FALSE)
 rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
 ```
@@ -417,7 +411,7 @@ rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
 
 [**Add the desired comparisons, change the names of the numerator and denominator and the names of the objects you're storing the results in.**]{style="color: red"}
 
-```{r degs, eval=FALSE}
+```{r degs, eval=TRUE}
 resultsNames(dseq)
 
 one_vs_two <- analyzeRNA::pairwiseDEGresults(numerator = "comparisongroup",
@@ -449,7 +443,7 @@ The genemap will create a data frame that includes all of the Ensembl Gene IDs i
 
 [**Do not change (unless you want to add more things like gene biotype)**]{style="color: red"}
 
-```{r make_genemap, eval=FALSE}
+```{r make_genemap, eval=TRUE}
 allgenes <- tibble::rownames_to_column(rlog_df, var = "GeneID")
 allgenes <- select(allgenes, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,  GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description"))
@@ -477,13 +471,13 @@ gmap <- analyzeRNA::createGenemap(allgenes,  GMattributes = c("ensembl_gene_id",
 
 [**Add all of your pairwise comparisons, so all of your results get annotated**]{style="color: red"}
 
-```{r annotate_degs, eval=FALSE}
+```{r annotate_degs, eval=TRUE}
 
-one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two, gmap) 
-two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three, gmap) 
+one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two, gmap, gmattri = c("MGI_Symbol", "MGI_Desc")) 
+two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three, gmap, gmattri = c("MGI_Symbol", "MGI_Desc")) 
 
 rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
-rlog_df <- analyzeRNA::annotate_biomart(rlog_df, gmap)
+rlog_df <- analyzeRNA::annotate_biomart(rlog_df, gmap, gmattri = c("MGI_Symbol", "MGI_Desc"))
 
 ```
 
@@ -515,7 +509,7 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df, gmap)
 
 [**Change threshold values (if desired), and adjust the results data frames being generated**]{style="color: red"}
 
-```{r signifDEG, eval=FALSE}
+```{r signifDEG, eval=TRUE}
 
 # set thresholds for adjusted P values and log2 fold changes in determining which genes to keep as significant
 padj_threshold <- 0.01
@@ -531,6 +525,7 @@ ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three, padj_threshold, l2fc_thr
 
 The `export_genelist` function will save the output of the `signif_deg` function as a csv, exporting it to the current working directory.
 The option to export just those genes that are up-regulated, just those that are down-regulated, or all genes is included.
+You can also export a full (unfiltered) gene list if you want, but to export that do not include the direction argument.
 **Do NOT include white space in the file name**
 
 +--------------------+----------------------------+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -547,7 +542,7 @@ The option to export just those genes that are up-regulated, just those that are
 
 [**Change the exports and the file names, feel free to export just up/down/both and not all three**]{style="color: red"}
 
-```{r exportlists, eval=FALSE}
+```{r exportlists, eval=TRUE}
 
 analyzeRNA::export_genelist(ranked_OneTwo, filename = "1vs2", direction = "up")
 analyzeRNA::export_genelist(ranked_OneTwo, filename = "1vs2", direction = "down")
@@ -578,7 +573,7 @@ Rlog transformed data will be used for this to ensure that sample distance isn't
 
 [**Do not edit this chunk**]{style="color: red"}
 
-```{r sample_distances, eval=FALSE}
+```{r sample_distances, eval=TRUE}
 analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 ```
 
@@ -629,7 +624,7 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 
 [**Change the title and if you want to label the dots change it to TRUE**]{style="color: red"}
 
-```{r PCA_analysis, eval=FALSE}
+```{r PCA_analysis, eval=TRUE}
 # run the function
 analyzeRNA::pca_analysis(dseq_transform = rlog_norm,
              plot_aes = plot_aes,
@@ -676,6 +671,8 @@ rlogUMAP
 The counts for specific genes can be plotted by group using the normalized counts.
 This can be done for specific genes of interest.
 Using the `plot_genecounts` function, the data can be saved to an object for plotting.
+You can check the genemap that was generated to see if a gene is in the results.
+The mgi argument must be spelled exactly as it is in the genemap and is case sensitive.
 
 +--------------------------+--------------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Input                    | Required?                            | Example                       | Notes                                                                                                                                                                                                                                                  |
@@ -733,7 +730,7 @@ Using the `plot_genecounts` function, the data can be saved to an object for plo
 
 [**change the mgi symbol names & add as you wish. edit the optional variables as you wish and add comparisons as desired, the below are just examples**]{style="color: red"}
 
-```{r plot_counts, eval=FALSE}
+```{r plot_counts, eval=TRUE}
 
 statcomps <- list(c("Naive", "Tolerant"), c("Naive", "Rejection"), c("Tolerant", "Rejection"))
 
@@ -761,45 +758,45 @@ plot_genecounts("Tox", rlog_df, meta, plot_aes, comparisons = statcomps, yaxisto
     -   *optional* change the threshold values as specified above
     -   *optional*
 
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| Input                      | Required?                     | Example                       | Notes                                                                                                                                    |
-+============================+===============================+===============================+==========================================================================================================================================+
-| `deg_df`                   | Required                      |                               | annotated but *unfiltered* results dataframe                                                                                             |
-|                            |                               |                               |                                                                                                                                          |
-| dataframe                  |                               |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `plotTitle`                | Required                      | `"Condition 1 vs 2 DEGs"`     |                                                                                                                                          |
-|                            |                               |                               |                                                                                                                                          |
-| string                     |                               |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `cond1`                    | Required                      | `"Tolerant"`                  | The first condition (numerator) in the results data frame. Must be typed how it was above                                                |
-|                            |                               |                               |                                                                                                                                          |
-| string                     |                               |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `cond2`                    | Required                      | `"Rejecting"`                 | The second condition (denominator) in the results data frame                                                                             |
-|                            |                               |                               |                                                                                                                                          |
-| string                     |                               |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `l2fc_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn & which points will be colored                                                                      |
-|                            |                               |                               |                                                                                                                                          |
-| number                     | defaults to 1                 |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `pval_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn and which points will be colored                                                                    |
-|                            |                               |                               |                                                                                                                                          |
-| number                     | defaults to 0.01              |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `dircolors`                | Optional;                     | `c("green", "red", "gray70")` | The colors for upregulated in condition 1, downregulated in condition 1 and not significant. I recommend leaving the third as `"gray70"` |
-|                            |                               |                               |                                                                                                                                          |
-| list of 3 strings (colors) | defaults to red blue and gray |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
-| `dirshapes`                | Optional;                     | `c(18, 18, 19)`               | The shapes for up in condition 1, down in condition 1 and not significant.                                                               |
-|                            |                               |                               |                                                                                                                                          |
-| list of 3 numbers (shapes) | defaults to circles           |                               |                                                                                                                                          |
-+----------------------------+-------------------------------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------+
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Input                      | Required?                     | Example                       | Notes                                                                                                                                                                                                                                                                |
++============================+===============================+===============================+======================================================================================================================================================================================================================================================================+
+| `deg_df`                   | Required                      |                               | annotated but *unfiltered* results dataframe                                                                                                                                                                                                                         |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| dataframe                  |                               |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `plotTitle`                | Required                      | `"Condition 1 vs 2 DEGs"`     |                                                                                                                                                                                                                                                                      |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| string                     |                               |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `cond1`                    | Required                      | `"Tolerant"`                  | The first condition (numerator) in the results data frame. Must be typed how it was above                                                                                                                                                                            |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| string                     |                               |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `cond2`                    | Required                      | `"Rejecting"`                 | The second condition (denominator) in the results data frame                                                                                                                                                                                                         |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| string                     |                               |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `l2fc_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn & which points will be colored                                                                                                                                                                                                  |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| number                     | defaults to 1                 |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `pval_cutoff`              | Optional;                     |                               | where the cutoff lines will be drawn and which points will be colored                                                                                                                                                                                                |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| number                     | defaults to 0.01              |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `dircolors`                | Optional;                     | `c("green", "red", "gray70")` | The colors for upregulated in condition 1, downregulated in condition 1 and not significant. I recommend leaving the third as `"gray70"` or gray with any number 70-90. You can copy paste the exact color id from your plot aes dataframe if you want it to match.  |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| list of 3 strings (colors) | defaults to red blue and gray |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `dirshapes`                | Optional;                     | `c(18, 18, 19)`               | The shapes for up in condition 1, down in condition 1 and not significant.                                                                                                                                                                                           |
+|                            |                               |                               |                                                                                                                                                                                                                                                                      |
+| list of 3 numbers (shapes) | defaults to circles           |                               |                                                                                                                                                                                                                                                                      |
++----------------------------+-------------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Volcano plots inputs
 
-```{r volcano_plots, eval=FALSE}
+```{r volcano_plots, eval=TRUE}
 analyzeRNA::volcano_plot(deg_df = one_vs_two, 
                          plotTitle = "One vs Two", 
                          cond1 = "One", cond2 = "Two")
