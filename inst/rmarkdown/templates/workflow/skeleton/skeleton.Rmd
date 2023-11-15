@@ -495,15 +495,17 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df, gmap, gmattri = c("MGI_Symbol",
     -   `Change Metric` is also added to each gene and the resultant data frame will be sorted according to this.
         The metric is calculated as $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$.
 
-+------------------------------+-----------------------------------------------------+
-| Input                        | Required?                                           |
-+==============================+=====================================================+
-| `result` annotated dataframe | Required                                            |
-+------------------------------+-----------------------------------------------------+
-| `padj_cutoff` number         | Optional; defaults to 0.05                          |
-+------------------------------+-----------------------------------------------------+
-| `l2fc_cutoff` number         | Optional; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC) |
-+------------------------------+-----------------------------------------------------+
++------------------------------+------------------------------------------------------------------------------------+
+| Input                        | Required?                                                                          |
++==============================+====================================================================================+
+| `result` annotated dataframe | Required                                                                           |
++------------------------------+------------------------------------------------------------------------------------+
+| `padj_cutoff` number         | Optional; defaults to 0.05                                                         |
++------------------------------+------------------------------------------------------------------------------------+
+| `l2fc_cutoff` number         | Optional; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC)                                |
++------------------------------+------------------------------------------------------------------------------------+
+| `entrezid` boolean           | defaults to TRUE, change to FALSE if entrez id is not included in your annotations |
++------------------------------+------------------------------------------------------------------------------------+
 
 : Filter DEGs function inputs
 
@@ -820,23 +822,58 @@ You can do GSEA analysis on just one of these or a combination of them.
 
 These analyses will use pairwise comparison results, not the rlog normalized counts.
 
+Over expression or over representation analysis is slightly different from gene set enrichment analysis.
+OE analysis id's individual genes that are significantly up or down in one condition compared to another.
+GSEA id's groups of genes that are enriched in one condition vs another.
+GSEA is generally more powerful but both can be useful
+
 ### Over-representation Analysis
 
-```{r over_representation, eval=FALSE}
+For OE analysis, if you use GO (gene ontology) database you're good to go with the ensembl id (gene id column).
+If you want to use the KEGG database you need to include the EntrezID in your genemap and your annotations.
+KEGG ORA takes the same inputs as GO ORA except it does not include the `ontol` argument.
+
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+| Input                                               | Required?                   | Example/Notes                                                                                                                                     |
++=====================================================+=============================+===================================================================================================================================================+
+| `deg_df` dataframe of annotated pairwise comparison | Required                    | Use the annotated pairwise comparison, not the filtered one and not the rlog counts                                                               |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+| `pval_cutoff` number                                | Optional; defaults to 0.05  |                                                                                                                                                   |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+| `l2fc_cutoff` number                                | Optional; defaults to 0.5   |                                                                                                                                                   |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+| `ontol` string                                      | Optional; defaults to "ALL" | One of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: go_ORA inputs
+
+```{r over_representation, eval=TRUE}
+one_vs_two_ORA <- go_ORA(one_vs_two, ontol = "BP")
+
 
 ```
 
 ### Gene Set Enrichment Analysis (GSEA)
 
-The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color).
-This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
+GO and KEGG GSEA functions take the same inputs except that KEGG doesnt include the `ontol` argument.
+If you're using KEGG GSEA your annotated dataframe must include EntrezID
 
-```{r get_gsea, eval=FALSE}
+| Input            | Required?                     | Example/Notes                                                                                                                                     |
+|------------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `degs` dataframe | Required                      | annotated pairwise comparison dataframe (not filtered)                                                                                            |
+| `ontol` string   | Optional; defaults to `"ALL"` | One of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions |
 
+: go_GSEA inputs
 
+```{r get_gsea, eval=TRUE}
+
+one_vs_two_GSEA <- go_GSEA(one_vs_two, ontol = "BP")
 
 
 ```
+
+The dotplot shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color).
+This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
 
 ```{r gsea_dotplots, eval=FALSE}
 
