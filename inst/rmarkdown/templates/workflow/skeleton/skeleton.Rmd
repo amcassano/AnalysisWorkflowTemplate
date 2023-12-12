@@ -3,12 +3,12 @@ title: "Analysis Workflow"
 author: "Alexandra Cassano"
 date: "`r Sys.Date()`"
 output:
-  html_document: 
+  html_document:
     df_print: tibble
     highlight: tango
     theme: united
     toc: yes
-    toc_float: 
+    toc_float:
         collapsed: true
   pdf_document:
     number_sections: yes
@@ -100,13 +100,13 @@ library(devtools)
 library(roxygen2)
 library(tidyverse)
 library(org.Mm.eg.db)
-library(utils) 
+library(utils)
 library(stringi)
 library(stringr)
 library(knitr)
 library(rmarkdown)
-library(biomaRt) 
-library(DESeq2) 
+library(biomaRt)
+library(DESeq2)
 library(ashr)
 library(ggplot2)
 library(ggrepel)
@@ -122,7 +122,7 @@ library(DOSE)
 
 if (!require(devtools)) { install.packages('devtools') }
 devtools::install_github('JamesJoly/DGSEA')
-devtools::install_github('amcassano/RNAseqAnalysisPackage') 
+devtools::install_github('amcassano/RNAseqAnalysisPackage')
 library(DGSEA)
 library(analyzeRNA) #arguably the most important line of code, this imports all the code I wrote
 library(org.Mm.eg.db)
@@ -227,14 +227,14 @@ meta$Group <- factor(meta$Group,
                                 "group6"))
 
 # pre-filtering
-count_minimum <- 800 
+count_minimum <- 800
 numberofsamples <- 20
 raw_counts$row_sum <- apply(raw_counts, 1, sum)
 raw_counts <- raw_counts %>%
   dplyr::filter(row_sum > count_minimum) %>%
   dplyr::select(-c(row_sum))
 
-# set the sample ID as the row name for the metadata 
+# set the sample ID as the row name for the metadata
 rownames(meta) <- meta$SampleID
 meta <- meta %>% dplyr::select(-c(SampleID))
 
@@ -251,7 +251,7 @@ Replace the text in quotes (`"new name 1"`) with what you want the new group nam
 Fill in the factoring list so that the new group names replace any old ones, include unchanged group names as well
 
 ```{r rename_groups, eval=FALSE}
-# rename groups 
+# rename groups
 meta$Group <- recode_factor(meta$Group, group1 = "new name 1")
 meta$Group <- recode_factor(meta$Group, group2 = "New name 2")
 meta$Group <- recode_factor(meta$Group, group3 = "new name 3")
@@ -296,7 +296,7 @@ analyzeRNA::getPalettes()
 [**Change the colors and shapes. Make sure that the number of arguments provided match the number of conditions you have. Add or remove lines from the `anno_colors` in the below format for the number of different conditions you have.**]{style="color: red"}
 
 ```{r set_aesthetics, eval=TRUE}
-plot_aes <- analyzeRNA::set_aes(group_labels, 
+plot_aes <- analyzeRNA::set_aes(group_labels,
                                 c("shape1", "shape2", "shape3"),
                                 c("outline1", "outline2", "outline3"),
                                 c("fill1", "fill2", "fill3"))
@@ -311,7 +311,7 @@ anno_colors <- list(
     group5 = as.character(plot_aes$outlineID[5]),
     group6 = as.character(plot_aes$outlineID[6])
   )
-)             
+)
 ```
 
 ------------------------------------------------------------------------
@@ -446,7 +446,7 @@ The genemap will create a data frame that includes all of the Ensembl Gene IDs i
 ```{r make_genemap, eval=TRUE}
 allgenes <- tibble::rownames_to_column(rlog_df, var = "GeneID")
 allgenes <- select(allgenes, GeneID)
-gmap <- analyzeRNA::createGenemap(allgenes,  
+gmap <- analyzeRNA::createGenemap(allgenes,
                                   GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description")) #change this if desired
 ```
 
@@ -477,12 +477,12 @@ gmap <- analyzeRNA::createGenemap(allgenes,
 one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two,
                                            gmap, #dont change this
                                            gmattri = c("MGI_Symbol", "MGI_Desc")) #change this if you changed whats in the annotation
-two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three, 
+two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three,
                                              gmap, #dont change this
                                              gmattri = c("MGI_Symbol", "MGI_Desc")) #change this if you changed whats in the annotation
 
 rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
-rlog_df <- analyzeRNA::annotate_biomart(rlog_df, 
+rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
                                         gmap, #dont change this
                                         gmattri = c("MGI_Symbol", "MGI_Desc")) #change this if you changed whats in the annotation
 
@@ -520,11 +520,11 @@ padj_threshold <- 0.01
 l2fc_threshold <- 1
 
 # create ranked and filtered list of dif expr genes
-ranked_OneTwo <- analyzeRNA::signif_deg(one_vs_two, 
-                                        padj_threshold, 
+ranked_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
+                                        padj_threshold,
                                         l2fc_threshold)
-ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three, 
-                                          padj_threshold, 
+ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
+                                          padj_threshold,
                                           l2fc_threshold)
 
 ```
@@ -548,18 +548,18 @@ You can also export a full (unfiltered) gene list if you want, but to export tha
 
 ```{r exportlists, eval=TRUE}
 
-analyzeRNA::export_genelist(ranked_OneTwo, 
-                            filename = "1vs2", 
+analyzeRNA::export_genelist(ranked_OneTwo,
+                            filename = "1vs2",
                             direction = "up")
 
-analyzeRNA::export_genelist(ranked_OneTwo, 
-                            filename = "1vs2", 
+analyzeRNA::export_genelist(ranked_OneTwo,
+                            filename = "1vs2",
                             direction = "down")
 
-analyzeRNA::export_genelist(ranked_OneTwo, 
+analyzeRNA::export_genelist(ranked_OneTwo,
                             filename = "1vs2")
 
-analyzeRNA::export_genelist(one_vs_two, 
+analyzeRNA::export_genelist(one_vs_two,
                             filename = "1vs2unfiltered")
 
 
@@ -743,20 +743,20 @@ The mgi argument must be spelled exactly as it is in the genemap and is case sen
 
 ```{r plot_counts, eval=TRUE}
 #edit this so that its the right comparisons
-statcomps <- list(c("Naive", "Tolerant"), 
-                  c("Naive", "Rejection"), 
+statcomps <- list(c("Naive", "Tolerant"),
+                  c("Naive", "Rejection"),
                   c("Tolerant", "Rejection"))
 
-plot_genecounts("Pdcd1", 
-                rlog_df, 
-                meta, 
+plot_genecounts("Pdcd1",
+                rlog_df,
+                meta,
                 plot_aes)
 
-plot_genecounts(mgi = "Tox", 
-                norm_df = rlog_df, 
-                metadat = meta, 
-                plot_aes =  plot_aes, 
-                comparisons = statcomps, 
+plot_genecounts(mgi = "Tox",
+                norm_df = rlog_df,
+                metadat = meta,
+                plot_aes =  plot_aes,
+                comparisons = statcomps,
                 yaxistozero = TRUE)
 
 
@@ -819,17 +819,17 @@ plot_genecounts(mgi = "Tox",
 : Volcano plots inputs
 
 ```{r volcano_plots, eval=TRUE}
-analyzeRNA::volcano_plot(deg_df = one_vs_two, 
-                         plotTitle = "One vs Two", 
-                         cond1 = "One", 
+analyzeRNA::volcano_plot(deg_df = one_vs_two,
+                         plotTitle = "One vs Two",
+                         cond1 = "One",
                          cond2 = "Two")
 
-analyzeRNA::volcano_plot(deg_df = two_vs_three, 
-                         plotTitle = "Two vs Three", 
-                         cond1 = "Two", 
+analyzeRNA::volcano_plot(deg_df = two_vs_three,
+                         plotTitle = "Two vs Three",
+                         cond1 = "Two",
                          cond2 = "Three",
-                         l2fc_cutoff = 1.5, 
-                         pval_cutoff = 0.05, 
+                         l2fc_cutoff = 1.5,
+                         pval_cutoff = 0.05,
                          dircolors = c("green", "red", "gray70"),
                          dirshapes = c(24, 25, 19))
 ```
@@ -885,7 +885,7 @@ If you're using KEGG GSEA your annotated dataframe must include EntrezID
 
 ```{r get_gsea, eval=TRUE}
 
-one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, 
+one_vs_two_GSEA <- go_GSEA(degs = one_vs_two,
                            ontol = "BP")
 
 
@@ -903,7 +903,7 @@ The dot plot shows the number of genes associated with the first 50 terms (size)
 This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
 
 ```{r gsea_dotplots, eval=TRUE}
-gseDotPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseDotPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                           plot_title = "1 vs 2 GSEA",
                           plot_type = "dot",
                           categories_to_show = 35, #defaults to 30
@@ -919,7 +919,7 @@ gseDotPlot
 ridge plots are a lot like dot plots but will show the enrichment distribution rather than the gene ratio
 
 ```{r gsea_ridgeplots, eval=TRUE}
-gseRidgePlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseRidgePlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                             plot_title = "1 vs 2 GSEA",
                             plot_type = "ridge")
 
@@ -930,7 +930,7 @@ gseRidgePlot
 #### Cluster Plot
 
 ```{r gsea_clusterplots, eval=TRUE}
-gseClusterPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseClusterPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                               plot_title = "1 vs 2 GSEA",
                               plot_type = "cluster")
 
@@ -940,7 +940,7 @@ gseClusterPlot
 #### Heat plot
 
 ```{r gsea_heatplots, eval=TRUE}
-gseHeatPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseHeatPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                            plot_title = "1 vs 2 GSEA",
                            plot_type = "heat")
 
@@ -950,7 +950,7 @@ gseHeatPlot
 #### Upset plot
 
 ```{r gsea_upsetplots, eval=TRUE}
-gseUpsetPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseUpsetPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                             plot_title = "1 vs 2 GSEA",
                             plot_type = "upset")
 
@@ -960,7 +960,7 @@ gseUpsetPlot
 #### Tree plot
 
 ```{r gsea_treeplots, eval=TRUE}
-gseTreePlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseTreePlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                            plot_title = "1 vs 2 GSEA",
                            plot_type = "tree")
 
@@ -970,7 +970,7 @@ gseTreePlot
 #### Traditional plot
 
 ```{r gsea_tradplots, eval=TRUE}
-gseTradPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA, 
+gseTradPlot <- makeGSEplot(GSE_obj = one_vs_two_GSEA,
                            plot_title = "1 vs 2 GSEA",
                            plot_type = "traditional")
 
@@ -980,8 +980,8 @@ gseTradPlot
 #### Category net plot
 
 ```{r category_netplot, eval=TRUE}
-catplot <- categorynetplot(go_obj = one_vs_two_GSEA, 
-                           deg_df = one_vs_two, 
+catplot <- categorynetplot(go_obj = one_vs_two_GSEA,
+                           deg_df = one_vs_two,
                            pval_cutoff = 0.01, #defaults to 0.05
                            l2fc_cutoff = 0.8, #defaults to 0.5
                            categories_to_show = 35, #defaults to 30
@@ -1046,7 +1046,7 @@ prolif_heatmap
 
 ```{r df_heatmap, eval=TRUE}
 #first grab the top however many genes from your comparisons
-# below shows how to get the top genes from 2 different comparisons together. 
+# below shows how to get the top genes from 2 different comparisons together.
 #you can add or subtract depending on your comparisons
 top_genes <- rbind(
   dplyr::slice_head(ranked_OneTwo, n = 15) %>% select(MGI_Symbol),
