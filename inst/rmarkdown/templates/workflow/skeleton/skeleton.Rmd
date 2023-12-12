@@ -985,7 +985,7 @@ catplot <- categorynetplot(go_obj = one_vs_two_GSEA,
                            pval_cutoff = 0.01, #defaults to 0.05
                            l2fc_cutoff = 0.8, #defaults to 0.5
                            categories_to_show = 35, #defaults to 30
-                           ontol = "BP") #defaults to "ALL"
+                           shape = "circle") #defaults to "circle"
 
 catplot
 ```
