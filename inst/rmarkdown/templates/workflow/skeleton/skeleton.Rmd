@@ -888,7 +888,7 @@ If you're using KEGG GSEA your annotated dataframe must include EntrezID
 one_vs_two_GSEA <- go_GSEA(degs = one_vs_two,
                            ontol = "BP")
 
-
+one_vs_twoFC <- getFoldChange(one_vs_two)
 ```
 
 ### GSEA/ORA Plots
