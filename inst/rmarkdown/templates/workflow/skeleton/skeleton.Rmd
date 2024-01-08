@@ -520,10 +520,12 @@ l2fc_threshold <- 1
 # create ranked and filtered list of dif expr genes
 ranked_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
                                         padj_threshold,
-                                        l2fc_threshold)
+                                        l2fc_threshold,
+                                        entrezid = F)
 ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
                                           padj_threshold,
-                                          l2fc_threshold)
+                                          l2fc_threshold,
+                                          entrezid = F)
 
 ```
 
@@ -850,7 +852,7 @@ GSEA is generally more powerful but both can be useful
 
 ### Over-representation Analysis
 
-For OE analysis, if you use GO (gene ontology) database you're good to go with the ensembl id (gene id column).
+For OE/OR analysis, if you use GO (gene ontology) database you're good to go with the ensembl id (gene id column).
 If you want to use the KEGG database you need to include the EntrezID in your genemap and your annotations.
 KEGG ORA takes the same inputs as GO ORA except it does not include the `ontol` argument.
 
@@ -862,12 +864,6 @@ KEGG ORA takes the same inputs as GO ORA except it does not include the `ontol` 
 | `ontol` string                                      | Optional; defaults to "ALL" | One of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions |
 
 : go_ORA inputs
-
-```{r over_representation, eval=TRUE}
-one_vs_two_ORA <- go_ORA(one_vs_two, ontol = "BP")
-
-
-```
 
 ### Gene Set Enrichment Analysis (GSEA)
 
@@ -881,12 +877,12 @@ If you're using KEGG GSEA your annotated dataframe must include EntrezID
 
 : go_GSEA inputs
 
-```{r get_gsea, eval=TRUE}
+```{r gsea_ora, eval=TRUE}
 
-one_vs_two_GSEA <- go_GSEA(degs = one_vs_two,
-                           ontol = "BP")
-
-one_vs_twoFC <- getFoldChange(one_vs_two)
+one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, pval_cutoff = 0.075, ontol = "BP")
+one_vs_two_ORA <- go_ORA(deg_df = one_vs_two, pval_cutoff = 0.075, ontol = "BP")
+one_vs_two_FC <- getFoldChanges(one_vs_two)
+one_vs_two_sigFC <- getFoldChanges(ranked_one_vs_two)
 ```
 
 ### GSEA/ORA Plots
@@ -1058,4 +1054,18 @@ top_heatmap <- heatmapFromDF(plottitle = "Top 15 genes from each comparison",
                              counts_df = rlog_df,
                              annocolors = anno_colors)
 
+```
+
+### Heatmap from GO pathways
+
+```{r go_heatmaps}
+go_groups2 <- goGrouping(one_vs_two, pval_cutoff = 0.075, l2fc_cutoff = 0.45, lvl = 2) %>% print()
+
+go_groups3 <- goGrouping(one_vs_two, pval_cutoff = 0.075, l2fc_cutoff = 0.45, lvl = 3)
+
+go_groups4 <- goGrouping(one_vs_two, pval_cutoff = 0.075, l2fc_cutoff = 0.45, lvl = 4)
+
+
+f <- getgenelistfromgogroup(go_groups2, 1)
+heatmapFromDF("GO Group", f, meta, rlog_df, anno_colors, gaps = c(5), height = 8)
 ```
