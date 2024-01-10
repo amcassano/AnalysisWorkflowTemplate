@@ -40,7 +40,7 @@ knitr::opts_chunk$set(echo = TRUE)
     Alternatively, click on the function name and use the toolbar.
     Click the 'Code' tab then find 'Go to Help'.
 
-*Built with R version 4.3.1. Most recent template changes made on September 28, 2023*
+*Built with R version 4.3.1. Most recent template changes made on January 10, 2024*
 
 # Prepare work-space
 
@@ -377,35 +377,30 @@ rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
     Add `log2FCshrink = TRUE` to the function call if you want to use this.
     The calculation used is the "ashr" algorithm (@stephens2016.)
 
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Input          | Required?             | Example                      | Notes                                                                                                                                                                                                     |
-+================+=======================+==============================+===========================================================================================================================================================================================================+
-| `numerator`    | Required              | `"Tolerant"` `"Naive"` etc   | Must match exactly the way it's written in the DESeq object. If unsure run just the `resultsNames(dseq)` line of code.                                                                                    |
-|                |                       |                              |                                                                                                                                                                                                           |
-| string         |                       |                              |                                                                                                                                                                                                           |
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `denominator`  | Required              | `"Tolerant"` `"Naive"` etc   | Must match exactly the way it's written in the DESeq object. If unsure run just the `resultsNames(dseq)` line of code.                                                                                    |
-|                |                       |                              |                                                                                                                                                                                                           |
-| string         |                       |                              |                                                                                                                                                                                                           |
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `dseq_obj`     | Required              | dseq                         | This is the DESeq object we saved two chunks above. Don't change the name of it unless you also changed the name in the above chunks.                                                                     |
-|                |                       |                              |                                                                                                                                                                                                           |
-| DESeqObject    |                       |                              |                                                                                                                                                                                                           |
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `contrast_str` | Optional;             | `"Group"`, `"Condition"` etc | This will be indicate what is the independent variable in your data. If you set things up as I described above it should be Group. If not, you may need to specify Condition or something else like that. |
-|                |                       |                              |                                                                                                                                                                                                           |
-| string         | defaults to `"Group"` |                              |                                                                                                                                                                                                           |
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `tidy_result`  | Optional;             | `TRUE` or `FALSE`            | When set to TRUE the results will output as a nice dataframe. IDK why you'd want to change that. Odds are you'll leave it be                                                                              |
-|                |                       |                              |                                                                                                                                                                                                           |
-| TRUE/FALSE     | defaults to `TRUE`    |                              |                                                                                                                                                                                                           |
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `log2FCshrink` | Optional;             | `TRUE` or `FALSE`            | If you've got a lot of variance going on in your data you might want to set this to TRUE. It will do some math to handle that. I don't understand the math but feel free to look it up if you care to.    |
-|                |                       |                              |                                                                                                                                                                                                           |
-| TRUE/FALSE     | defaults to `FALSE`   |                              |                                                                                                                                                                                                           |
-+----------------+-----------------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+-   **Pairwise comparison function inputs:**
 
-: Pairwise Comparison Function Inputs
+    -   `numerator`-\> required; string; must match exactly as it's written in the DESeq object.
+        If unsure run just the `resultsNames(dseq)` line of code.
+        (ex: "Tolerant", "Naive")
+
+    -   `denominator` -\> required; string; must match exactly as it's written in the DESeq object.
+        If unsure run just the `resultsNames(dseq)` line of code.
+        (ex: "Tolerant", "Naive")
+
+    -   `dseq_obj` -\> required; DESeqObject; This is the DESeq object we saved two chunks above.
+        Don't change the name of it unless you also changed the name in the above chunks.
+
+    -   `contrast_str` -\> optional; string; defaults to `"Group"`; This will be indicate what is the independent variable in your data.
+        If you set things up as I described above it should be Group.
+        If not, you may need to specify Condition or something else like that.
+
+    -   `tidy_result` -\> optional; boolean; defaults to `TRUE`; When set to TRUE the results will output as a nice dataframe.
+        IDK why you'd want to change that.
+        Odds are you'll leave it be
+
+    -   `log2FCshrink` -\> optional; boolean; defaults to `FALSE`; If you've got a lot of variance going on in your data you might want to set this to TRUE.
+        It will do some math to handle that.
+        I don't understand the math but feel free to look it up if you care to.
 
 [**Add the desired comparisons, change the names of the numerator and denominator and the names of the objects you're storing the results in.**]{style="color: red"}
 
@@ -450,23 +445,10 @@ gmap <- analyzeRNA::createGenemap(allgenes,
 
 ## Annotate pairwise comparisons (DEGs)
 
-+-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-| Input             | Required?                            | Example                                    | Notes                                                                                                                               |
-+===================+======================================+============================================+=====================================================================================================================================+
-| `res`             | Required                             | `rlog_df`, a pairwise comparison dataframe | must include 'GeneID' column with ensembl ID                                                                                        |
-|                   |                                      |                                            |                                                                                                                                     |
-| results dataframe |                                      |                                            |                                                                                                                                     |
-+-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-| `gm`              | Required                             | `gmap`                                     | created using the chunk above                                                                                                       |
-|                   |                                      |                                            |                                                                                                                                     |
-| genemap           |                                      |                                            |                                                                                                                                     |
-+-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-| `gmattri`         | Optional;                            | `c("MGI_Symbol",`                          | Dictates which columns from the gene map are kept after renaming and reordering. Can't include a column not present in the genemap. |
-|                   |                                      |                                            |                                                                                                                                     |
-| list of strings   | defaults to MGI symbol & description | `"MGI_Desc", "GeneType")`                  |                                                                                                                                     |
-+-------------------+--------------------------------------+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-
-: Annotation Function Inputs
+-   **annotation function inputs**
+    -   `res` -\> required; dataframe; the results data frame generated earlier, must include `GeneID` column with the ensembl ID in it (ex. `rlog_df`, `one_vs_two`)
+    -   `gm` -\> required; dataframe; the genemap generated using the above chunk
+    -   `gmattri` -\> optional; list of strings; defaults to including just MGI symbol and description; Dictates which columns from the gene map are kept after renaming and reordering. Can't include a column not present in the genemap (ex. `c("MGI_Symbol", "GeneType", "EntrezID")`)
 
 [**Add all of your pairwise comparisons, so all of your results get annotated**]{style="color: red"}
 
@@ -500,14 +482,17 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
     -   `Change Metric` is also added to each gene and the resultant data frame will be sorted according to this.
         The metric is calculated as $Change\space Metric = \log_2(Fold \space Change) *-\log(adj.\space P \space value)$.
 
-| Input                        | Required?                                                                          |
-|------------------------------|------------------------------------------------------------------------------------|
-| `result` annotated dataframe | Required                                                                           |
-| `padj_cutoff` number         | Optional; defaults to 0.05                                                         |
-| `l2fc_cutoff` number         | Optional; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC)                                |
-| `entrezid` boolean           | defaults to TRUE, change to FALSE if entrez id is not included in your annotations |
+-   **Filter significant DEGs function inputs**
 
-: Filter DEGs function inputs
+    -   `result` -\> required; the annotated results dataframe (generated above)
+
+    -   `padj_cutoff` -\> optional; number; defaults to 0.05, the cutoff for what will be considered a signifcant p value
+
+    -   `l2fc_cutoff` -\> optional; number; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC)
+
+    -   `entrezid` -\> optional; boolean; defaults to `TRUE`, change to `FALSE` if EntrezID is not in your annotations
+
+    -   for a gene to make it through the filter it must meet both the p value cutoff and log2 fold change cutoff
 
 [**Change threshold values (if desired), and adjust the results data frames being generated**]{style="color: red"}
 
@@ -536,13 +521,10 @@ The option to export just those genes that are up-regulated, just those that are
 You can also export a full (unfiltered) gene list if you want, but to export that do not include the direction argument.
 **Do NOT include white space in the file name**
 
-| Input              | Required?                  | Example/Options                             | Notes                                                                                                                                          |
-|:-------------------|----------------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| `tab` data frame   | Required                   | the annotated and filtered signficiant DEGs |                                                                                                                                                |
-| `filename` string  | Required                   | `"TolVsNaiveSignifDEGs"`                    | If you are exporting just up or down the function will append up or down to the end of the file name. `".csv"` is not needed in the file name. |
-| `direction` string | Optional; defaults to both | `"up"`, `"down"`, or leave it blank         | if you use anything other than up or down it will export everything.                                                                           |
-
-: Export DEGs function inputs
+-   **Export function inputs**
+    -   `tab` -\> required; dataframe; annotated (and optionally filtered) dataframe of DEGs or rLog counts
+    -   `filename` -\> required; string; the name of the file to export to, it will be exported to your cwd set above, do not include ".csv" that will be added automatically, if you're exporting only up- or down-regulated genes that will be added to the file name automatically as well
+    -   `direction` -\> optional; string; defaults to blank; must be either `"up"`, `"down"` or left blank; if exporting rlog counts leave blank
 
 [**Change the exports and the file names, feel free to export just up/down/both and not all three**]{style="color: red"}
 
@@ -600,38 +582,20 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 
 -   PCA has a few major limitations.
 
-    -   You cannot say for certain what factor or combinations of factors are contributing to the variance.
-        However, you do get very clear insight into overall similarity and differences between samples.
+    -   You cannot say for certain what factor or combinations of factors are contributing to the variance. However, you do get very clear insight into overall similarity and differences between samples.
+    -   Inclusion of a group of samples that are vastly different than the rest will limit the information you can glean from a PCA plot. If the difference between naive samples and any treatment condition is more significant than any other differences, then you will not be able to see other differences present. To further interrogate your samples I recommend removing samples like naive from your data set and running the PCA analysis on that. This will let you see what groupings emerge without something like naive driving \~80% of the variance.
+    -   For a PCA plot to really give good information, you would hope to see the principal components account for \~50-60% of the total variance. Ideally, PC1 would account for \~30+% of the variance.
 
-    -   Inclusion of a group of samples that are vastly different than the rest will limit the information you can glean from a PCA plot.
-        If the difference between naive samples and any treatment condition is more significant than any other differences, then you will not be able to see other differences present.
-        To further interrogate your samples I recommend removing samples like naive from your data set and running the PCA analysis on that.
-        This will let you see what groupings emerge without something like naive driving \~80% of the variance.
+-   **PCA inputs**
 
-    -   For a PCA plot to really give good information, you would hope to see the principal components account for \~50-60% of the total variance.
-        Ideally, PC1 would account for \~30+% of the variance.
+    -   `dseq_transform` -\> required; DESeqTransform object; must be the actual object not the dataframe (ex. `rlog_norm`)
 
-+-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
-| Input                 | Required?                                    | Example                                                      | Notes                                                                                                                                   |
-+=======================+==============================================+==============================================================+=========================================================================================================================================+
-| `dseq_transform`      | Required                                     | `rlog_norm`                                                  | you need to use the actual object and not the data frame for this                                                                       |
-|                       |                                              |                                                              |                                                                                                                                         |
-| DESeqTransform object |                                              |                                                              |                                                                                                                                         |
-+-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
-| `plot_aes`            | Required                                     | `plot_aes`                                                   | use the dataframe created in the set_aesthetics chunk                                                                                   |
-|                       |                                              |                                                              |                                                                                                                                         |
-| dataframe             |                                              |                                                              |                                                                                                                                         |
-+-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
-| `plot_title`          | Optional;                                    | Any title for the plot you desire. Make sure it's in quotes. |                                                                                                                                         |
-|                       |                                              |                                                              |                                                                                                                                         |
-| string                | defaults to `"Principal Component Analysis"` |                                                              |                                                                                                                                         |
-+-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
-| `label_samples`       | Optional;                                    | `TRUE` or `FALSE`                                            | Setting to True will add labels to (some of) the data points in the plot. Most helpful when you want to be able to identify an outlier. |
-|                       |                                              |                                                              |                                                                                                                                         |
-| TRUE/FALSE            | defaults to `FALSE`                          |                                                              |                                                                                                                                         |
-+-----------------------+----------------------------------------------+--------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+    -   `plot_aes` -\> required; dataframe; the plot aesthetics set above (`plot_aes`)
 
-: PCA function inputs
+    -   `plot_title` -\> optional; string; defaults to `"Principal Component Analysis"`
+
+    -   `label_samples` -\> optional; boolean; defaults to `FALSE`; setting to `TRUE` will label as many points as possible without having too many overlaps.
+        useful to ID an outlier
 
 [**Change the title and if you want to label the dots change it to TRUE**]{style="color: red"}
 
@@ -856,12 +820,17 @@ For OE/OR analysis, if you use GO (gene ontology) database you're good to go wit
 If you want to use the KEGG database you need to include the EntrezID in your genemap and your annotations.
 KEGG ORA takes the same inputs as GO ORA except it does not include the `ontol` argument.
 
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | Input                                               | Required?                   | Example/Notes                                                                                                                                     |
-|-----------------------------------------------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
++=====================================================+=============================+===================================================================================================================================================+
 | `deg_df` dataframe of annotated pairwise comparison | Required                    | Use the annotated pairwise comparison, not the filtered one and not the rlog counts                                                               |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | `pval_cutoff` number                                | Optional; defaults to 0.05  |                                                                                                                                                   |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | `l2fc_cutoff` number                                | Optional; defaults to 0.5   |                                                                                                                                                   |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | `ontol` string                                      | Optional; defaults to "ALL" | One of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions |
++-----------------------------------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : go_ORA inputs
 
@@ -870,10 +839,13 @@ KEGG ORA takes the same inputs as GO ORA except it does not include the `ontol` 
 GO and KEGG GSEA functions take the same inputs except that KEGG doesnt include the `ontol` argument.
 If you're using KEGG GSEA your annotated dataframe must include EntrezID
 
++------------------+-------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | Input            | Required?                     | Example/Notes                                                                                                                                     |
-|------------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
++==================+===============================+===================================================================================================================================================+
 | `degs` dataframe | Required                      | annotated pairwise comparison dataframe (not filtered)                                                                                            |
++------------------+-------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | `ontol` string   | Optional; defaults to `"ALL"` | One of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions |
++------------------+-------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : go_GSEA inputs
 
