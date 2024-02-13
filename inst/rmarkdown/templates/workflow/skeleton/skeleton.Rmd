@@ -722,16 +722,33 @@ analyzeRNA::volcano_plot(deg_df = two_vs_three,
                          dirshapes = c(24, 25, 19))
 ```
 
+## Compare two sets of DEGs from two different pairwise comparisons
+
 Say that you want to compare the DEGs from two different pairwise comparisons - here you can plot Log2 Change vs Log2 Fold Change
 
 ```{r comparative_volcano, eval=TRUE}
 analyzeRNA::comparativeVolcano(deg_df1 = one_vs_three, 
                                deg_df2 = two_vs_three, 
                                plotTitle = "Compare these",
-                               cond1 = "one vs. three",
-                               cond2 = "two vs. three",
+                               conditions = c("one", "three", "two", "three"),
                                l2fc_cutoff = 1.2,
                                pval_cutoff = 0.35)
+```
+
+You can use this chunk to generate a dataframe of this comparison and to export it to CSVs
+
+```{r compareDEGs}
+one_two_vs_three <- analyzeRNA::compareDEGlists(deg_df1 = one_vs_three,
+                                                deg_df2 = two_vs_three,
+                                                conditions = c("one", "three", "two", "three"),
+                                                l2fc_cutoff = 1.2, pval_cutoff = 0.35,
+                                                export = FALSE)
+
+onevthree_twovfour <- analyzeRNA::compareDEGlists(deg_df1 = one_vs_three,
+                                                  deg_df2 = two_vs_four,
+                                                  conditions = c("one", "three", "two", "four"),
+                                                  l2fc_cutoff = 1.2, pval_cutoff = 0.35,
+                                                  export = TRUE)
 ```
 
 ## Gene Ontology Based Analysis
