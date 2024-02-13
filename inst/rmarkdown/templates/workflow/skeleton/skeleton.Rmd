@@ -728,9 +728,8 @@ Say that you want to compare the DEGs from two different pairwise comparisons - 
 analyzeRNA::comparativeVolcano(deg_df1 = one_vs_three, 
                                deg_df2 = two_vs_three, 
                                plotTitle = "Compare these",
-                               cond1 = "one",
-                               cond2 = "two",
-                               denom = "three", 
+                               cond1 = "one vs. three",
+                               cond2 = "two vs. three",
                                l2fc_cutoff = 1.2,
                                pval_cutoff = 0.35)
 ```
