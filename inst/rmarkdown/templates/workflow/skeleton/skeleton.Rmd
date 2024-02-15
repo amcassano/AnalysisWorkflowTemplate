@@ -40,7 +40,7 @@ knitr::opts_chunk$set(echo = TRUE)
     Alternatively, click on the function name and use the toolbar.
     Click the 'Code' tab then find 'Go to Help'.
 
-*Built with R version 4.3.1. Most recent template changes made on January 10, 2024*
+*Built with R version 4.3.1. Most recent template changes made on Feb 14, 2024*
 
 # Prepare work-space
 
