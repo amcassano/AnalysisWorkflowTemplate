@@ -76,7 +76,7 @@ BiocManager::install(c("DESeq2",
                        "GenomicRanges",
                        "Repitools",
                        "clusterProfiler",
-                       "org.Mm.eg.db"
+                       "org.Mm.eg.db",
                        "DOSE",
                        "pathview",
                        "treemap",
