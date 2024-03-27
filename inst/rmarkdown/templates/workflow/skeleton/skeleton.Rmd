@@ -160,6 +160,7 @@ Your working directory should contain:
 ```{r workingdirectory, eval=TRUE}
 # set working directory
 cwd <- "parentfolder/childfolder/yourfolder"
+setwd(cwd)
 ```
 
 ## Data import & preparation
@@ -458,7 +459,7 @@ The genemap will create a data frame that includes all of the Ensembl Gene IDs i
 
 ```{r make_genemap, eval=TRUE}
 allgenes <- tibble::rownames_to_column(rlog_df, var = "GeneID")
-allgenes <- select(allgenes, GeneID)
+allgenes <- dplyr::select(allgenes, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,
     GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description")
 ) # change this if desired
@@ -611,25 +612,47 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 
 -   **PCA inputs**
 
-    -   `dseq_transform` -\> required; DESeqTransform object; must be the actual object not the dataframe (ex. `rlog_norm`)
+    -   `norm_df` -\> required; dataframe of normalized counts (ex. `rlog_df`)
 
     -   `plot_aes` -\> required; dataframe; the plot aesthetics set above (`plot_aes`)
-
+    -   `metadat` -\> required, metadata dataframe
+    -   `varianceRemove` -\> defaults to 0.05 which removes lowest 5% of variables based on variance. If there are ~2000 genes then removing 75% would leave the top 500 genes to make the PCA from
     -   `plot_title` -\> optional; string; defaults to `"Principal Component Analysis"`
-
+    -   `draw_polygon` -\> defaults to false, if true will draw a polygon around each groups samples
+    -   `draw_ellipses` -\> defaults to true, will attempt to draw an statistical ellipse around your samples
+    -   `pcs` -\> a list of 2 strings that are the PCs to use, defaults to `c("PC1", "PC2")`
     -   `label_samples` -\> optional; boolean; defaults to `FALSE`; setting to `TRUE` will label as many points as possible without having too many overlaps.
         useful to ID an outlier
+    - other parameters for extra customization are available, check the help page
 
 [**Change the title and if you want to label the dots change it to TRUE**]{style="color: red"}
 
 ```{r PCA_analysis, eval=TRUE}
 # run the function
 analyzeRNA::pca_analysis(
-    dseq_transform = rlog_norm,
+    norm_df = rlog_df,
     plot_aes = plot_aes,
-    plot_title = "PCA",
+    metadat = meta,
+    varianceRemove = 0.25,
+    draw_polygon = TRUE,
+    draw_ellipses = FALSE,
     label_samples = FALSE
 )
+
+analyzeRNA::pca_analysis(
+    norm_df = rlog_df,
+    plot_aes = plot_aes,
+    metadat = meta,
+    varianceRemove = 0.25,
+    label_samples = FALSE
+)
+
+# see how much variance is explained by each PC
+p <- analyzeRNA::get_pca_obj(rlog_df, meta, 0.25)
+PCAtools::screeplot(p)
+
+# see what is contributing to each PC
+PCAtools::plotloadings(p)
 ```
 
 ## UMAP
@@ -834,9 +857,13 @@ one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, pval_cutoff = 0.075, ontol = "BP")
 one_vs_two_ORA <- go_ORA(deg_df = one_vs_two, pval_cutoff = 0.075, ontol = "BP")
 one_vs_two_FC <- getFoldChanges(one_vs_two)
 one_vs_two_sigFC <- getFoldChanges(ranked_one_vs_two)
+
+# if you want to export the results
+one_vs_two_GSEAresults <- one_vs_two_GSEA@result
+export_genelist(one_vs_two_GSEAresults, "One_vs_two_GSEA_results")
 ```
 
-### GSEA/ORA Plots
+### GSEA/ORA
 
 There are many different ways to plot the results of GSEA and ORA.
 Most work for both ORA and GSEA but some are only good for GSEA.
@@ -948,6 +975,14 @@ catplot <- categorynetplot(
 
 catplot
 ```
+
+### Revigo
+From https://revigo.irb.hr/ - this code will help you see what similar pathways are represented in your GSEA data
+
+```{r revigo}
+
+```
+
 
 ## Heatmaps
 
