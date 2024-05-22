@@ -40,7 +40,7 @@ knitr::opts_chunk$set(echo = TRUE)
     Alternatively, click on the function name and use the toolbar.
     Click the 'Code' tab then find 'Go to Help'.
 
-*Built with R version 4.3.1. Most recent template changes made on Feb 14, 2024*
+*Built with R version 4.3.1. Most recent template changes made on May 22, 2024*
 
 # Prepare work-space
 
@@ -96,6 +96,7 @@ BiocManager::install("PCAtools")
 
 devtools::install_github("JamesJoly/DGSEA")
 devtools::install_github("amcassano/RNAseqAnalysisPackage")
+
 ```
 
 ## Load packages
@@ -149,18 +150,26 @@ All files being imported should also be in this folder.
 
 Your working directory should contain:
 
-1.  CSV file containing all of the raw read counts obtained from the fastq files
-
-2.  CSV file containing the meta-data for your experiment
-
-3.  CSV files with any gene sets of interest
+1.  A folder called `raw_input` that has 1. CSV file containing all of the raw read counts obtained from the fastq files 2. CSV file containing the meta-data for your experiment
+2.  A folder called `gene_lists` that has CSV files with any gene sets of interest
+3.  this R markdown file
 
 [**Change the working directory variable (change what is in the quotes) You will need to use the complete path. The path should end with the name of the folder, you should omit the trailing '/'**]{style="color: red"}
 
 ```{r workingdirectory, eval=TRUE}
 # set working directory
-cwd <- "parentfolder/childfolder/yourfolder"
-setwd(cwd)
+primary_directory <- "parentfolder/childfolder/yourfolder"
+setwd(primary_directory)
+
+# this is the folder that contains your CSV files containing raw counts and your meta data CSV
+raw_dir <- paste0(primary_directory, "/raw_input")
+
+# this is the folder that contains your CSV files that are lists of MGI symbols of interest
+genelist_dir <- paste0(primary_directory, "/gene_lists")
+
+# this code will create an output directory for you if it doesnt exist. this is where exported analyses will be saved
+output_dir <- paste0(primary_directory, "/analysis_outputs")
+if (!dir.exists(output_dir)) { dir.create(output_dir) }
 ```
 
 ## Data import & preparation
@@ -193,11 +202,11 @@ setwd(cwd)
 ```{r import_data, eval=TRUE}
 # import files
 countsCSV <- "yourcountsfile.csv"
-countsCSV <- paste(cwd, countsCSV, sep = "/")
+countsCSV <- paste(raw_dir, countsCSV, sep = "/")
 raw_counts <- read.csv(countsCSV, header = TRUE, sep = ",")
 
 metadataCSV <- "yourmetadatafile.csv"
-metadataCSV <- paste(cwd, metadataCSV, sep = "/")
+metadataCSV <- paste(raw_dir, metadataCSV, sep = "/")
 meta <- read.csv(metadataCSV, header = TRUE, sep = ",")
 ```
 
@@ -438,12 +447,26 @@ two_vs_three <- analyzeRNA::pairwiseDEGresults(
 )
 ```
 
+The `pairwiseDEGresults` function calls the DESeq2 package's `results` function.
+According to the documentation for this
+
+> "By default, independent filtering is performed to select a set of genes for multiple test correction which maximizes the number of adjusted p-values less than a given critical value alpha (by default 0.1). See the reference in this man page for details on independent filtering. The filter used for maximizing the number of rejections is the mean of normalized counts for all samples in the dataset. Several arguments from the filtered_p function of the genefilter package (used within the results function) are provided here to control the independent filtering behavior. (Note filtered_p R code is now copied into DESeq2 package to avoid gfortran requirements.) In DESeq2 version \>= 1.10, the threshold that is chosen is the lowest quantile of the filter for which the number of rejections is close to the peak of a curve fit to the number of rejections over the filter quantiles. 'Close to' is defined as within 1 residual standard deviation. The adjusted p-values for the genes which do not pass the filter threshold are set to NA. By default, results assigns a p-value of NA to genes containing count outliers, as identified using Cook's distance. See the cooksCutoff argument for control of this behavior. Cook's distances for each sample are accessible as a matrix "cooks" stored in the assays() list. This measure is useful for identifying rows where the observed counts might not fit to a Negative Binomial distribution."
+
+Therefore, we will want to remove those same genes from the `rlog_df`.
+The code below will accomplish this.
+Change the name of the object `one_vs_two` to reflect one of your pairwise comparisons.
+
+```{r remove_NAs}
+rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
+rlog_df <- dplyr::filter(rlog_df, GeneID %in% one_vs_two$GeneID)
+```
+
 # Annotate Results
 
 -   The initial `raw_counts` table, and therefore all DESeq results derived from it, use the *Ensembl ID* to identify each gene.
     However, this is not a useful identifier for most humans.
 
--   The BiomaRt package can be used to match the *Ensembl ID* with it's corresponding *MGI Symbol*, *MGI Description*, (and optionally things like the *Gene Biotype*, and *Entrez (NCBI) ID*).
+-   The BiomaRt package can be used to match the *Ensembl ID* with it's corresponding *MGI Symbol*, *MGI Description*, (and optionally things like the *Entrez (NCBI) ID* ).
 
 -   The genemap can be altered to omit or include different attributes as needed.
     The genemap is then used along with a `deseq results object` in the `annotate_biomart()` function to add these descriptors to the results.
@@ -455,14 +478,13 @@ two_vs_three <- analyzeRNA::pairwiseDEGresults(
 
 The genemap will create a data frame that includes all of the Ensembl Gene IDs in your entire data set and their corresponding MGI symbol and description.
 
-[**Do not change (unless you want to add more things like gene biotype)**]{style="color: red"}
+[**Do not change (unless you want to add more things like EntrezID)**]{style="color: red"}
 
 ```{r make_genemap, eval=TRUE}
-allgenes <- tibble::rownames_to_column(rlog_df, var = "GeneID")
-allgenes <- dplyr::select(allgenes, GeneID)
+allgenes <- dplyr::select(rlog_df, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,
     GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description")
-) # change this if desired
+) # change this if desired, be warned though if you add EntrezID you'll need to adjust things further down to reflec that
 ```
 
 ## Annotate pairwise comparisons (DEGs)
@@ -479,12 +501,12 @@ one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two,
     gmap, # dont change this
     gmattri = c("MGI_Symbol", "MGI_Desc")
 ) # change this if you changed whats in the annotation
+
 two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three,
     gmap, # dont change this
     gmattri = c("MGI_Symbol", "MGI_Desc")
 ) # change this if you changed whats in the annotation
 
-rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
 rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
     gmap, # dont change this
     gmattri = c("MGI_Symbol", "MGI_Desc")
@@ -513,7 +535,7 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
 
     -   `l2fc_cutoff` -\> optional; number; defaults to 0.8 (0.8 Log2 FC = \~1.74 FC)
 
-    -   `entrezid` -\> optional; boolean; defaults to `TRUE`, change to `FALSE` if EntrezID is not in your annotations
+    -   `entrezid` -\> optional; boolean; defaults to `FALSE`, change to `TRUE` if EntrezID is in your annotations
 
     -   for a gene to make it through the filter it must meet both the p value cutoff and log2 fold change cutoff
 
@@ -521,20 +543,26 @@ rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
 
 ```{r signifDEG, eval=TRUE}
 # set thresholds for adjusted P values and log2 fold changes in determining which genes to keep as significant
-padj_threshold <- 0.01
-l2fc_threshold <- 1
+padj_threshold <- 0.05
+l2fc_threshold <- 0.8
 
 # create ranked and filtered list of dif expr genes
 ranked_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
     padj_threshold,
-    l2fc_threshold,
-    entrezid = F
+    l2fc_threshold
 )
 ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
     padj_threshold,
-    l2fc_threshold,
-    entrezid = F
+    l2fc_threshold
 )
+```
+
+This chunk will create a filtered dataframe only containing genes that reach your specified significance threshold in your specified pairwise comparisons.This will filter out genes that aren't at all different in any of the pairwise comparisons of interest.
+This removes some of the noise from genes that have reads but dont change.
+
+```{r filtered_rlogdf}
+#add any/all pairwise comparisons (not the ranked version) to the end of the function call
+rlog_df <- analyzeRNA::filtered_rlog(p_thresh = 0.1, fc_thresh = 0.4, rlogdf = rlog_df, one_vs_two, two_vs_three)
 ```
 
 # Export lists of significantly DEGs
@@ -546,12 +574,14 @@ You can also export a full (unfiltered) gene list if you want, but to export tha
 
 -   **Export function inputs**
     -   `tab` -\> required; dataframe; annotated (and optionally filtered) dataframe of DEGs or rLog counts
-    -   `filename` -\> required; string; the name of the file to export to, it will be exported to your cwd set above, do not include ".csv" that will be added automatically, if you're exporting only up- or down-regulated genes that will be added to the file name automatically as well
+    -   `filename` -\> required; string; the name of the file to export to, it will be exported to your output dir set above, do not include ".csv" that will be added automatically, if you're exporting only up- or down-regulated genes that will be added to the file name automatically as well
     -   `direction` -\> optional; string; defaults to blank; must be either `"up"`, `"down"` or left blank; if exporting rlog counts leave blank
 
 [**Change the exports and the file names, feel free to export just up/down/both and not all three**]{style="color: red"}
 
 ```{r exportlists, eval=TRUE}
+setwd(output_dir)
+
 analyzeRNA::export_genelist(ranked_OneTwo,
     filename = "1vs2",
     direction = "up"
@@ -615,15 +645,24 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
     -   `norm_df` -\> required; dataframe of normalized counts (ex. `rlog_df`)
 
     -   `plot_aes` -\> required; dataframe; the plot aesthetics set above (`plot_aes`)
+
     -   `metadat` -\> required, metadata dataframe
-    -   `varianceRemove` -\> defaults to 0.05 which removes lowest 5% of variables based on variance. If there are ~2000 genes then removing 75% would leave the top 500 genes to make the PCA from
+
+    -   `varianceRemove` -\> defaults to 0.05 which removes lowest 5% of variables based on variance.
+        If there are \~2000 genes then removing 75% would leave the top 500 genes to make the PCA from
+
     -   `plot_title` -\> optional; string; defaults to `"Principal Component Analysis"`
+
     -   `draw_polygon` -\> defaults to false, if true will draw a polygon around each groups samples
+
     -   `draw_ellipses` -\> defaults to true, will attempt to draw an statistical ellipse around your samples
+
     -   `pcs` -\> a list of 2 strings that are the PCs to use, defaults to `c("PC1", "PC2")`
+
     -   `label_samples` -\> optional; boolean; defaults to `FALSE`; setting to `TRUE` will label as many points as possible without having too many overlaps.
         useful to ID an outlier
-    - other parameters for extra customization are available, check the help page
+
+    -   other parameters for extra customization are available, check the help page
 
 [**Change the title and if you want to label the dots change it to TRUE**]{style="color: red"}
 
@@ -977,12 +1016,12 @@ catplot
 ```
 
 ### Revigo
-From https://revigo.irb.hr/ - this code will help you see what similar pathways are represented in your GSEA data
+
+From <https://revigo.irb.hr/> - this code will help you see what similar pathways are represented in your GSEA data
 
 ```{r revigo}
 
 ```
-
 
 ## Heatmaps
 
