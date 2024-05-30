@@ -40,7 +40,9 @@ knitr::opts_chunk$set(echo = TRUE)
     Alternatively, click on the function name and use the toolbar.
     Click the 'Code' tab then find 'Go to Help'.
 
-*Built with R version 4.3.1. Most recent template changes made on May 22, 2024*
+## \*\* If you aren't sure what inputs you should use for a given function check out the help page. You can access this by putting you cursor within a function name and hitting F1 or going to the code menu in the toolbar and clicking "Go to Help". \*\*
+
+*Built with R version 4.3.2. Most recent template changes made on May 30, 2024*
 
 # Prepare work-space
 
@@ -52,6 +54,7 @@ This will also get everything set up in the right format for downstream code.
 This segment of code should only be run if the packages are not already installed on whichever computer this is being run on.
 In order to have this chunk run, hit the run chunk button.
 If you're running chunk by chunk be sure to run this chunk the first time but do not run this code subsequent times.
+All of the functions from the `analyzeRNA` package (and all functions generally) has a help page that I've written for them.
 
 [**Do not edit this chunk (just hit the run chunk button if needed)**]{style="color: red"}
 
