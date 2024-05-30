@@ -685,7 +685,7 @@ analyzeRNA::pca_analysis(
 p <- analyzeRNA::get_pca_obj(rlog_df, meta, 0.85)
 PCAtools::screeplot(p)
 
-# see what is contributing to each PC
+# see what is contributing to each PC, this is very helpful!
 PCAtools::plotloadings(p)
 ```
 
@@ -693,6 +693,7 @@ The PCA code above provides a lot of customizability.
 You can also use this simple code.
 This takes the top 500 genes by variance and plots the PCA using those.
 This uses the built in PCA from the `DESeq2` package.
+But you can't do things like see what is driving each PC or easily look at other PCs.
 
 ```{r other_pca_code}
 analyzeRNA::originalPCA(dseq_transform = rlog_norm,
