@@ -686,6 +686,9 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 [**Change the title and if you want to label the dots change it to TRUE**]{style="color: red"}
 
 ```{r PCA_analysis, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/PCA_analyses"))
+
 # run the function
 # there is a ton of customizability in my fancy new code, take a peek at the function help to see what paramters you can change
 analyzeRNA::pca_analysis(
@@ -705,6 +708,9 @@ PCAtools::screeplot(p)
 
 # see what is contributing to each PC, this is very helpful!
 PCAtools::plotloadings(p)
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 The PCA code above provides a lot of customizability.
@@ -714,10 +720,16 @@ This uses the built in PCA from the `DESeq2` package.
 But you can't do things like see what is driving each PC or easily look at other PCs.
 
 ```{r other_pca_code}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/DEseq_PCA"))
+
 analyzeRNA::originalPCA(dseq_transform = rlog_norm,
                         plot_aes = plot_aes,
                         plot_title = "PCA",
                         label_samples = FALSE)
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ## UMAP
@@ -741,6 +753,10 @@ analyzeRNA::originalPCA(dseq_transform = rlog_norm,
 [**you can change the seed around, play with the neighbors and m Dist, change the title and toggle labels**]{style="color: red"}
 
 ```{r umapAnalysis, eval=FALSE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/UMAP"))
+
+
 set.seed(5)
 rlogUMAP <- umap_analysis(
     dseq_transform = rlog_norm,
@@ -754,6 +770,9 @@ rlogUMAP <- umap_analysis(
 )
 
 rlogUMAP
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ## Plot counts
@@ -780,6 +799,9 @@ The mgi argument must be spelled exactly as it is in the genemap and is case sen
 [**change the mgi symbol names & add as you wish. edit the optional variables as you wish and add comparisons as desired, the below are just examples**]{style="color: red"}
 
 ```{r plot_counts, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/plot_counts"))
+
 # edit this so that its the right comparisons
 statcomps <- list(
     c("Naive", "Tolerant"),
@@ -802,6 +824,9 @@ plot_genecounts(
     comparisons = statcomps,
     yaxistozero = TRUE
 )
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ## Volcano Plot
@@ -826,6 +851,9 @@ plot_genecounts(
     -   `dirshapes` -\> optional; list of 3 numbers; defaults to all circles; The shapes for up in condition 1, down in condition 1 and not significant. (ex. `c(18, 18, 19)`)
 
 ```{r volcano_plots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/volcano_plots"))
+
 analyzeRNA::volcano_plot(
     deg_df = one_vs_two,
     plotTitle = "One vs Two",
@@ -843,6 +871,9 @@ analyzeRNA::volcano_plot(
     dircolors = c("green", "red", "gray70"),
     dirshapes = c(24, 25, 19)
 )
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ## Compare two sets of DEGs from two different pairwise comparisons
@@ -850,6 +881,9 @@ analyzeRNA::volcano_plot(
 Say that you want to compare the DEGs from two different pairwise comparisons - here you can plot Log2 Change vs Log2 Fold Change
 
 ```{r comparative_volcano, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/comp_volcanoplot"))
+
 analyzeRNA::comp_volcano(
     deg_df1 = one_vs_three,
     deg_df2 = two_vs_three,
@@ -858,6 +892,9 @@ analyzeRNA::comp_volcano(
     l2fc_cutoff = 1.2,
     pval_cutoff = 0.35
 )
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 You can use this chunk to generate a dataframe of this comparison and to export it to CSVs
@@ -956,6 +993,9 @@ The dot plot shows the number of genes associated with the first 50 terms (size)
 This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
 
 ```{r gsea_dotplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_dot_plots"))
+
 gseDotPlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -966,13 +1006,20 @@ gseDotPlot <- makeGSEplot(
 ) # defaults to 9
 
 gseDotPlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Ridge plots
 
-ridge plots are a lot like dot plots but will show the enrichment distribution rather than the gene ratio
+ridge plots are a lot like dot plots but will show the enrichment distribution rather than the gene ratio.
+I personally think that this is a more useful plot than the dot plot.
 
 ```{r gsea_ridgeplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_ridge_plots"))
+
 gseRidgePlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -980,11 +1027,17 @@ gseRidgePlot <- makeGSEplot(
 )
 
 gseRidgePlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Cluster Plot
 
 ```{r gsea_clusterplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_cluster_plots"))
+
 gseClusterPlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -992,11 +1045,17 @@ gseClusterPlot <- makeGSEplot(
 )
 
 gseClusterPlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Heat plot
 
 ```{r gsea_heatplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_heat_plots"), width = 50)
+
 gseHeatPlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -1004,11 +1063,17 @@ gseHeatPlot <- makeGSEplot(
 )
 
 gseHeatPlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Upset plot
 
 ```{r gsea_upsetplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_upset_plots"))
+
 gseUpsetPlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -1016,11 +1081,17 @@ gseUpsetPlot <- makeGSEplot(
 )
 
 gseUpsetPlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Tree plot
 
 ```{r gsea_treeplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_tree_plots"), height = 12)
+
 gseTreePlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -1028,11 +1099,17 @@ gseTreePlot <- makeGSEplot(
 )
 
 gseTreePlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Traditional plot
 
 ```{r gsea_tradplots, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_trad_plots"))
+
 gseTradPlot <- makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
@@ -1040,11 +1117,17 @@ gseTradPlot <- makeGSEplot(
 )
 
 gseTradPlot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 #### Category net plot
 
 ```{r category_netplot, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_category_plots"))
+
 catplot <- categorynetplot(
     go_obj = one_vs_two_GSEA,
     deg_df = one_vs_two,
@@ -1055,6 +1138,9 @@ catplot <- categorynetplot(
 ) # defaults to "circle"
 
 catplot
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ### Revigo
@@ -1062,7 +1148,12 @@ catplot
 From <https://revigo.irb.hr/> - this code will help you see what similar pathways are represented in your GSEA data
 
 ```{r revigo}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/GSEA_revigo_plots"))
 
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ## Heatmaps
@@ -1079,9 +1170,13 @@ If you want to plot genes from a few different GO pathways that are closely rela
 this will return one dataframe that has all of the unqiue genes from all of your inputted CSVs.
 You can also take the top x number of significantly changed genes in some comparison and then plot expression across all the groups for those.
 
-### Heatmap from 1 CSV
+### Heatmaps
 
 ```{r heatmap_from_csv, eval=TRUE}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/heatmaps"))
+
+# make a heatmap from genes saved in a CSV
 oxphos_heatmap <- heatmapFromCSV(
     plottitle = "Oxidative Phosphorlyation Genes",
     fname = paste(genelist_dir, "oxphos.csv", sep = "/"),
@@ -1094,11 +1189,8 @@ oxphos_heatmap <- heatmapFromCSV(
 ) # defaults to 10, decreasing will make a more squished map, better for lots of genes
 
 oxphos_heatmap
-```
 
-### Heatmap from multiple CSVs
-
-```{r multiCSV_heatmap, eval=TRUE}
+# make a heatmap from genes from multiple CSVs
 # first create a dataframe consolidating all the genelists of interest
 cellprolif <- consolidate_gene_list(
     map = gmap,
@@ -1120,17 +1212,13 @@ prolif_heatmap <- heatmapFromDF(
 ) # defaults to 10
 
 prolif_heatmap
-```
 
-### Heatmap from some top genes
 
-```{r df_heatmap, eval=TRUE}
-# first grab the top however many genes from your comparisons
-# below shows how to get the top genes from 2 different comparisons together.
+# make a heatmap from the top x genes from whatever comparisons
 # you can add or subtract depending on your comparisons
 top_genes <- rbind(
-    dplyr::slice_head(ranked_OneTwo, n = 15) %>% select(MGI_Symbol),
-    dplyr::slice_head(ranked_TwoThree, n = 15) %>% select(MGI_Symbol)
+    dplyr::slice_head(ranked_OneTwo, n = 15) %>% dplyr::select(MGI_Symbol),
+    dplyr::slice_head(ranked_TwoThree, n = 15) %>% dplyr::select(MGI_Symbol)
 )
 top_genes <- dplyr::distinct(top_genes, MGI_Symbol, .keep_all = TRUE)
 
@@ -1141,18 +1229,29 @@ top_heatmap <- heatmapFromDF(
     counts_df = rlog_df,
     annocolors = anno_colors
 )
+
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
 
 ### Heatmap from GO pathways
 
-```{r go_heatmaps}
-go_groups2 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% print()
+```{r go_grouping_heatmaps}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/go_group_heatmaps"))
 
-go_groups3 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3)
+go_groups2 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% tibble::remove_rownames()
 
-go_groups4 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4)
+go_groups3 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3) %>% tibble::remove_rownames()
 
+go_groups4 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4) %>% tibble::remove_rownames()
 
-f <- getgenelistfromgogroup(go_groups2, 1)
+#get the genes in any of these go groups by the row number.
+
+f <- genelistFromGOGroup(go_groups3, 1)
 heatmapFromDF("GO Group", f, meta, rlog_df, anno_colors, gaps = c(5), height = 8)
+
+#comment out if you don't want to export images
+grDevices::dev.off()
 ```
