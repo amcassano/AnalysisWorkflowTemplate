@@ -447,10 +447,8 @@ two_vs_three <- analyzeRNA::pairwiseDEGresults(
 )
 ```
 
-The `pairwiseDEGresults` function calls the DESeq2 package's `results` function.
-According to the documentation for this
-
-> "By default, independent filtering is performed to select a set of genes for multiple test correction which maximizes the number of adjusted p-values less than a given critical value alpha (by default 0.1). See the reference in this man page for details on independent filtering. The filter used for maximizing the number of rejections is the mean of normalized counts for all samples in the dataset. Several arguments from the filtered_p function of the genefilter package (used within the results function) are provided here to control the independent filtering behavior. (Note filtered_p R code is now copied into DESeq2 package to avoid gfortran requirements.) In DESeq2 version \>= 1.10, the threshold that is chosen is the lowest quantile of the filter for which the number of rejections is close to the peak of a curve fit to the number of rejections over the filter quantiles. 'Close to' is defined as within 1 residual standard deviation. The adjusted p-values for the genes which do not pass the filter threshold are set to NA. By default, results assigns a p-value of NA to genes containing count outliers, as identified using Cook's distance. See the cooksCutoff argument for control of this behavior. Cook's distances for each sample are accessible as a matrix "cooks" stored in the assays() list. This measure is useful for identifying rows where the observed counts might not fit to a Negative Binomial distribution."
+The `pairwiseDEGresults` function calls the DESeq2 package's `results` function and removes any Genes that have a p-value of 'NA'.
+According to the documentation \> "By default, independent filtering is performed to select a set of genes for multiple test correction which maximizes the number of adjusted p-values less than a given critical value alpha (by default 0.1). See the reference in this man page for details on independent filtering. The filter used for maximizing the number of rejections is the mean of normalized counts for all samples in the dataset. Several arguments from the filtered_p function of the genefilter package (used within the results function) are provided here to control the independent filtering behavior. (Note filtered_p R code is now copied into DESeq2 package to avoid gfortran requirements.) In DESeq2 version \>= 1.10, the threshold that is chosen is the lowest quantile of the filter for which the number of rejections is close to the peak of a curve fit to the number of rejections over the filter quantiles. 'Close to' is defined as within 1 residual standard deviation. The adjusted p-values for the genes which do not pass the filter threshold are set to NA. By default, results assigns a p-value of NA to genes containing count outliers, as identified using Cook's distance. See the cooksCutoff argument for control of this behavior. Cook's distances for each sample are accessible as a matrix "cooks" stored in the assays() list. This measure is useful for identifying rows where the observed counts might not fit to a Negative Binomial distribution."
 
 Therefore, we will want to remove those same genes from the `rlog_df`.
 The code below will accomplish this.
@@ -672,7 +670,7 @@ analyzeRNA::pca_analysis(
     norm_df = rlog_df,
     plot_aes = plot_aes,
     metadat = meta,
-    varianceRemove = 0.25,
+    varianceRemove = 0.55,
     draw_polygon = TRUE,
     draw_ellipses = FALSE,
     label_samples = FALSE
@@ -682,7 +680,7 @@ analyzeRNA::pca_analysis(
     norm_df = rlog_df,
     plot_aes = plot_aes,
     metadat = meta,
-    varianceRemove = 0.25,
+    varianceRemove = 0.75,
     label_samples = FALSE
 )
 
@@ -692,6 +690,18 @@ PCAtools::screeplot(p)
 
 # see what is contributing to each PC
 PCAtools::plotloadings(p)
+```
+
+The PCA code above provides a lot of customizability.
+You can also use this simple code.
+This takes the top 500 genes by variance and plots the PCA using those.
+This uses the built in PCA from the `DESeq2` package.
+
+```{r other_pca_code}
+analyzeRNA::originalPCA(dseq_transform = rlog_norm,
+                        plot_aes = plot_aes,
+                        plot_title = "PCA",
+                        label_samples = FALSE)
 ```
 
 ## UMAP
