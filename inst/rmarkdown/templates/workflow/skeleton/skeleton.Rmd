@@ -448,6 +448,13 @@ two_vs_three <- analyzeRNA::pairwiseDEGresults(
     denominator = "anotherone",
     deseq_obj = dseq
 )
+
+one_vs_three <- analyzeRNA::pairwiseDEGresults(
+    numerator = "comparisongroup",
+    denominator = "anotherone",
+    deseq_obj = dseq
+)
+
 ```
 
 The `pairwiseDEGresults` function calls the DESeq2 package's `results` function and removes any Genes that have a p-value of 'NA'.
@@ -508,6 +515,11 @@ two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three,
     gmattri = c("MGI_Symbol", "MGI_Desc")
 ) # change this if you changed whats in the annotation
 
+one_vs_three <- analyzeRNA::annotate_biomart(one_vs_three,
+    gmap, # dont change this
+    gmattri = c("MGI_Symbol", "MGI_Desc")
+) # change this if you changed whats in the annotation
+
 rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
     gmap, # dont change this
     gmattri = c("MGI_Symbol", "MGI_Desc")
@@ -552,7 +564,13 @@ ranked_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
     padj_threshold,
     l2fc_threshold
 )
+
 ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
+    padj_threshold,
+    l2fc_threshold
+)
+
+ranked_OneThree <- analyzeRNA::signif_deg(one_vs_three,
     padj_threshold,
     l2fc_threshold
 )
@@ -845,6 +863,7 @@ analyzeRNA::comp_volcano(
 You can use this chunk to generate a dataframe of this comparison and to export it to CSVs
 
 ```{r compareDEGs}
+setwd(output_dir)
 one_two_vs_three <- analyzeRNA::compareDEGlists(
     deg_df1 = one_vs_three,
     deg_df2 = two_vs_three,
@@ -860,6 +879,20 @@ onevthree_twovfour <- analyzeRNA::compareDEGlists(
     l2fc_cutoff = 1.2, pval_cutoff = 0.35,
     export = TRUE
 )
+```
+
+## Shared Genes within comaprisons
+
+This code will generate a dataframe containing the shared significantly changed genes between 2+ pairwise comparisons.
+This should use the ranked dataframes
+
+```{r shared_genes}
+one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
+  suffix_list = c(".one", ".two"), 
+  ranked_OneThree, 
+  ranked_TwoThree, 
+  samedir = TRUE)
+
 ```
 
 ## Gene Ontology Based Analysis
@@ -900,13 +933,14 @@ If you're using KEGG GSEA your annotated dataframe must include EntrezID
     -   `ontol` -\> optional; string; defaults to `"ALL"`; one of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions
 
 ```{r gsea_ora, eval=TRUE}
-one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, pval_cutoff = 0.075, ontol = "BP")
-one_vs_two_ORA <- go_ORA(deg_df = one_vs_two, pval_cutoff = 0.075, ontol = "BP")
+one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
+one_vs_two_ORA <- go_ORA(deg_df = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
 one_vs_two_FC <- getFoldChanges(one_vs_two)
 one_vs_two_sigFC <- getFoldChanges(ranked_one_vs_two)
 
 # if you want to export the results
 one_vs_two_GSEAresults <- one_vs_two_GSEA@result
+setwd(output_dir)
 export_genelist(one_vs_two_GSEAresults, "One_vs_two_GSEA_results")
 ```
 
@@ -1050,7 +1084,7 @@ You can also take the top x number of significantly changed genes in some compar
 ```{r heatmap_from_csv, eval=TRUE}
 oxphos_heatmap <- heatmapFromCSV(
     plottitle = "Oxidative Phosphorlyation Genes",
-    fname = paste(cwd, "oxphos.csv", sep = "/"),
+    fname = paste(genelist_dir, "oxphos.csv", sep = "/"),
     met = meta,
     counts_df = rlog_df,
     annocolors = anno_colors,
@@ -1068,10 +1102,10 @@ oxphos_heatmap
 # first create a dataframe consolidating all the genelists of interest
 cellprolif <- consolidate_gene_list(
     map = gmap,
-    paste(cwd, "cell_division.csv", "/"),
-    paste(cwd, "cell_proliferation.csv", "/"),
-    paste(cwd, "nuclear_division.csv", "/"),
-    paste(cwd, "chromosome_segregation.csv", "/")
+    paste(genelist_dir, "cell_division.csv", "/"),
+    paste(genelist_dir, "cell_proliferation.csv", "/"),
+    paste(genelist_dir, "nuclear_division.csv", "/"),
+    paste(genelist_dir, "chromosome_segregation.csv", "/")
 )
 
 prolif_heatmap <- heatmapFromDF(
@@ -1112,11 +1146,11 @@ top_heatmap <- heatmapFromDF(
 ### Heatmap from GO pathways
 
 ```{r go_heatmaps}
-go_groups2 <- goGrouping(one_vs_two, pval_cutoff = 0.075, l2fc_cutoff = 0.45, lvl = 2) %>% print()
+go_groups2 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% print()
 
-go_groups3 <- goGrouping(one_vs_two, pval_cutoff = 0.075, l2fc_cutoff = 0.45, lvl = 3)
+go_groups3 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3)
 
-go_groups4 <- goGrouping(one_vs_two, pval_cutoff = 0.075, l2fc_cutoff = 0.45, lvl = 4)
+go_groups4 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4)
 
 
 f <- getgenelistfromgogroup(go_groups2, 1)
