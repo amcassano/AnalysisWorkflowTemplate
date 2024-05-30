@@ -669,26 +669,20 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 
 ```{r PCA_analysis, eval=TRUE}
 # run the function
+# there is a ton of customizability in my fancy new code, take a peek at the function help to see what paramters you can change
 analyzeRNA::pca_analysis(
     norm_df = rlog_df,
     plot_aes = plot_aes,
     metadat = meta,
-    varianceRemove = 0.55,
+    varianceRemove = 0.85,
     draw_polygon = TRUE,
     draw_ellipses = FALSE,
-    label_samples = FALSE
-)
-
-analyzeRNA::pca_analysis(
-    norm_df = rlog_df,
-    plot_aes = plot_aes,
-    metadat = meta,
-    varianceRemove = 0.75,
-    label_samples = FALSE
+    label_samples = FALSE,
+    pcs = c("PC1", "PC2")
 )
 
 # see how much variance is explained by each PC
-p <- analyzeRNA::get_pca_obj(rlog_df, meta, 0.25)
+p <- analyzeRNA::get_pca_obj(rlog_df, meta, 0.85)
 PCAtools::screeplot(p)
 
 # see what is contributing to each PC
