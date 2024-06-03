@@ -330,6 +330,7 @@ plot_aes <- analyzeRNA::set_aes(
 )
 
 # for heatmaps - be sure to change group1 group2 etc to the names of your conditions
+# make sure the order is correct
 anno_colors <- list(
     Group = c(
         group1 = as.character(plot_aes$outlineID[1]),
@@ -340,6 +341,16 @@ anno_colors <- list(
         group6 = as.character(plot_aes$outlineID[6])
     )
 )
+
+#change the names here to match your conditions, make sure the order is correct
+group1_color <- as.character(plot_aes$outlineID[1])
+group2_color <- as.character(plot_aes$outlineID[2])
+group3_color <- as.character(plot_aes$outlineID[3])
+
+# change the names here to match your conditions, make sure hte order is correct
+group1_shape <- as.numeric(plot_aes$shapeID[1])
+group2_shape <- as.numeric(plot_aes$shapeID[2])
+group3_shape <- as.numeric(plot_aes$shapeID[3])
 ```
 
 ------------------------------------------------------------------------
@@ -593,7 +604,7 @@ You can also export a full (unfiltered) gene list if you want, but to export tha
 
 -   **Export function inputs**
     -   `tab` -\> required; dataframe; annotated (and optionally filtered) dataframe of DEGs or rLog counts
-    -   `filename` -\> required; string; the name of the file to export to, it will be exported to your output dir set above, do not include ".csv" that will be added automatically, if you're exporting only up- or down-regulated genes that will be added to the file name automatically as well
+    -   `filename` -\> required; string; the name of the file to export to, it will be exported to your output dir set above, do not include ".csv" that will be added automatically, if you're exporting only up- or down-regulated genes that will be added to the file name automatically as well. avoid spaces or "-"
     -   `direction` -\> optional; string; defaults to blank; must be either `"up"`, `"down"` or left blank; if exporting rlog counts leave blank
 
 [**Change the exports and the file names, feel free to export just up/down/both and not all three**]{style="color: red"}
@@ -932,6 +943,43 @@ one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
 
 ```
 
+## Venn Diagrams
+
+Here you can create venn diagrams showing the \# of DEGs that are changed in multiple pairwise comparisons.
+Likely, you want to have the same denominator in all the pairwise comparisons but technically it works regardless.
+This should use ranked dataframes.
+You will need to input a list of the MGI symbols in each ranked dataframe and assign it a name (see examples below).
+Important to note: the shared DEGs are those that are found in both dataframes, not necessarily those that go in the same direction.
+For that, use the code above, or check the dataframe exported.
+You can also create a dataframe with the genes found in the intersections.
+
+```{r venn_diagrams}
+#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/venndiagrams"))
+
+two_comp_venndiagram <- plot_venndiagram(list("One" = ranked_OneThree, "Two" = ranked_TwoThree), 
+                                         plt_title = "# DEGs shared vs. Three",
+                                         edgecolor = c(group1_color, group2_color),
+                                         showintersects = TRUE)
+
+three_comp_venndiagram <- plot_venndiagram(list("One" = ranked_OneThree, 
+                                                "Two" = ranked_TwoThree, 
+                                                "Four" = ranked_FourThree), 
+                                         plt_title = "# DEGs shared vs. Three",
+                                         edgecolor = c(group1_color, group2_color, group3_color),
+                                         showintersects = FALSE)
+
+#comment out if you don't want to export images
+grDevices::dev.off()
+
+
+overlaps_onetwo_vsthree <- venn_overlaps(list("One" = ranked_OneThree, "Two" = ranked_TwoThree))
+
+overlaps_onetwofour_vsthree <- venn_overlaps(list("One" = ranked_OneThree, 
+                                                "Two" = ranked_TwoThree, 
+                                                "Four" = ranked_FourThree))
+```
+
 ## Gene Ontology Based Analysis
 
 [The code here was adapted from this page.](https://hbctraining.github.io/DGE_workshop/lessons/09_functional_analysis.html)
@@ -1145,7 +1193,9 @@ grDevices::dev.off()
 
 ### Revigo
 
-From <https://revigo.irb.hr/> - this code will help you see what similar pathways are represented in your GSEA data
+From <https://revigo.irb.hr/> - this code will help you see what similar pathways are represented in your GSEA data Often, the first however many pathways that are enriched in you GSE analysis will be similar.
+This can make it hard ot see the overarching pattern.
+The tree map and the cluster map are very helpful for this but this code also will help.
 
 ```{r revigo}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
