@@ -515,6 +515,13 @@ gmap <- analyzeRNA::createGenemap(allgenes,
 
 [**Add all of your pairwise comparisons, so all of your results get annotated**]{style="color: red"}
 
+```{r annotate_rlog, eval=TRUE}
+rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
+    gmap, # dont change this
+    gmattri = c("MGI_Symbol", "MGI_Desc")
+) # change this if you changed whats in the annotation
+```
+
 ```{r annotate_degs, eval=TRUE}
 one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two,
     gmap, # dont change this
@@ -531,10 +538,7 @@ one_vs_three <- analyzeRNA::annotate_biomart(one_vs_three,
     gmattri = c("MGI_Symbol", "MGI_Desc")
 ) # change this if you changed whats in the annotation
 
-rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
-    gmap, # dont change this
-    gmattri = c("MGI_Symbol", "MGI_Desc")
-) # change this if you changed whats in the annotation
+
 ```
 
 # Filter & sort significant DEGs
