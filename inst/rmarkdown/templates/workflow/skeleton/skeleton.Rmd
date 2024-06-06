@@ -773,7 +773,7 @@ grDevices::pdf(file = paste0(output_dir, "/UMAP"))
 
 
 set.seed(5)
-rlogUMAP <- umap_analysis(
+rlogUMAP <- analyzeRNA::umap_analysis(
     dseq_transform = rlog_norm,
     neighbors = 3,
     m_dist = 0.5,
@@ -824,14 +824,14 @@ statcomps <- list(
     c("Tolerant", "Rejection")
 )
 
-plot_genecounts(
+analyzeRNA::plot_genecounts(
     "Pdcd1",
     rlog_df,
     meta,
     plot_aes
 )
 
-plot_genecounts(
+analyzeRNA::plot_genecounts(
     mgi = "Tox",
     norm_df = rlog_df,
     metadat = meta,
