@@ -571,17 +571,17 @@ padj_threshold <- 0.05
 l2fc_threshold <- 0.8
 
 # create ranked and filtered list of dif expr genes
-ranked_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
+sig_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
     padj_threshold,
     l2fc_threshold
 )
 
-ranked_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
+sig_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
     padj_threshold,
     l2fc_threshold
 )
 
-ranked_OneThree <- analyzeRNA::signif_deg(one_vs_three,
+sig_OneThree <- analyzeRNA::signif_deg(one_vs_three,
     padj_threshold,
     l2fc_threshold
 )
@@ -591,7 +591,7 @@ This chunk will create a filtered dataframe only containing genes that reach you
 This removes some of the noise from genes that have reads but dont change.
 
 ```{r filtered_rlogdf}
-#add any/all pairwise comparisons (not the ranked version) to the end of the function call
+#add any/all pairwise comparisons (not the significant version) to the end of the function call
 rlog_df <- analyzeRNA::filtered_rlog(p_thresh = 0.1, fc_thresh = 0.4, rlogdf = rlog_df, one_vs_two, two_vs_three)
 ```
 
@@ -612,17 +612,17 @@ You can also export a full (unfiltered) gene list if you want, but to export tha
 ```{r exportlists, eval=TRUE}
 setwd(output_dir)
 
-analyzeRNA::export_genelist(ranked_OneTwo,
+analyzeRNA::export_genelist(sig_OneTwo,
     filename = "1vs2",
     direction = "up"
 )
 
-analyzeRNA::export_genelist(ranked_OneTwo,
+analyzeRNA::export_genelist(sig_OneTwo,
     filename = "1vs2",
     direction = "down"
 )
 
-analyzeRNA::export_genelist(ranked_OneTwo,
+analyzeRNA::export_genelist(sig_OneTwo,
     filename = "1vs2"
 )
 
@@ -932,13 +932,13 @@ onevthree_twovfour <- analyzeRNA::compareDEGlists(
 ## Shared Genes within comaprisons
 
 This code will generate a dataframe containing the shared significantly changed genes between 2+ pairwise comparisons.
-This should use the ranked dataframes
+This should use the significant dataframes
 
 ```{r shared_genes}
 one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
-  suffix_list = c(".one", ".two"), 
-  ranked_OneThree, 
-  ranked_TwoThree, 
+  suffix_list = c(".one", ".two"),
+  sig_OneThree,
+  sig_TwoThree,
   samedir = TRUE)
 
 ```
@@ -947,8 +947,8 @@ one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
 
 Here you can create venn diagrams showing the \# of DEGs that are changed in multiple pairwise comparisons.
 Likely, you want to have the same denominator in all the pairwise comparisons but technically it works regardless.
-This should use ranked dataframes.
-You will need to input a list of the MGI symbols in each ranked dataframe and assign it a name (see examples below).
+This should use signifianct dataframes.
+You will need to input a list of the MGI symbols in each signifianct dataframe and assign it a name (see examples below).
 Important to note: the shared DEGs are those that are found in both dataframes, not necessarily those that go in the same direction.
 For that, use the code above, or check the dataframe exported.
 You can also create a dataframe with the genes found in the intersections.
@@ -957,14 +957,14 @@ You can also create a dataframe with the genes found in the intersections.
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/venndiagrams"))
 
-two_comp_venndiagram <- plot_venndiagram(list("One" = ranked_OneThree, "Two" = ranked_TwoThree), 
+two_comp_venndiagram <- plot_venndiagram(list("One" = sig_OneThree, "Two" = sig_TwoThree),
                                          plt_title = "# DEGs shared vs. Three",
                                          edgecolor = c(group1_color, group2_color),
                                          showintersects = TRUE)
 
-three_comp_venndiagram <- plot_venndiagram(list("One" = ranked_OneThree, 
-                                                "Two" = ranked_TwoThree, 
-                                                "Four" = ranked_FourThree), 
+three_comp_venndiagram <- plot_venndiagram(list("One" = sig_OneThree,
+                                                "Two" = sig_TwoThree,
+                                                "Four" = sig_FourThree),
                                          plt_title = "# DEGs shared vs. Three",
                                          edgecolor = c(group1_color, group2_color, group3_color),
                                          showintersects = FALSE)
@@ -973,11 +973,11 @@ three_comp_venndiagram <- plot_venndiagram(list("One" = ranked_OneThree,
 grDevices::dev.off()
 
 
-overlaps_onetwo_vsthree <- venn_overlaps(list("One" = ranked_OneThree, "Two" = ranked_TwoThree))
+overlaps_onetwo_vsthree <- venn_overlaps(list("One" = sig_OneThree, "Two" = sig_TwoThree))
 
-overlaps_onetwofour_vsthree <- venn_overlaps(list("One" = ranked_OneThree, 
-                                                "Two" = ranked_TwoThree, 
-                                                "Four" = ranked_FourThree))
+overlaps_onetwofour_vsthree <- venn_overlaps(list("One" = sig_OneThree,
+                                                "Two" = sig_TwoThree,
+                                                "Four" = sig_FourThree))
 ```
 
 ## Gene Ontology Based Analysis
@@ -1021,7 +1021,7 @@ If you're using KEGG GSEA your annotated dataframe must include EntrezID
 one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
 one_vs_two_ORA <- go_ORA(deg_df = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
 one_vs_two_FC <- getFoldChanges(one_vs_two)
-one_vs_two_sigFC <- getFoldChanges(ranked_one_vs_two)
+one_vs_two_sigFC <- getFoldChanges(sig_one_vs_two)
 
 # if you want to export the results
 one_vs_two_GSEAresults <- one_vs_two_GSEA@result
@@ -1267,8 +1267,8 @@ prolif_heatmap
 # make a heatmap from the top x genes from whatever comparisons
 # you can add or subtract depending on your comparisons
 top_genes <- rbind(
-    dplyr::slice_head(ranked_OneTwo, n = 15) %>% dplyr::select(MGI_Symbol),
-    dplyr::slice_head(ranked_TwoThree, n = 15) %>% dplyr::select(MGI_Symbol)
+    dplyr::slice_head(sig_OneTwo, n = 15) %>% dplyr::select(MGI_Symbol),
+    dplyr::slice_head(sig_TwoThree, n = 15) %>% dplyr::select(MGI_Symbol)
 )
 top_genes <- dplyr::distinct(top_genes, MGI_Symbol, .keep_all = TRUE)
 
