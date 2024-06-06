@@ -592,7 +592,7 @@ This removes some of the noise from genes that have reads but dont change.
 
 ```{r filtered_rlogdf}
 #add any/all pairwise comparisons (not the significant version) to the end of the function call
-rlog_df <- analyzeRNA::filtered_rlog(p_thresh = 0.1, fc_thresh = 0.4, rlogdf = rlog_df, one_vs_two, two_vs_three)
+sig_rlog <- analyzeRNA::rlog_filtering(p_thresh = 0.1, fc_thresh = 0.4, rlogdf = rlog_df, one_vs_two, two_vs_three)
 ```
 
 # Export lists of significantly DEGs
