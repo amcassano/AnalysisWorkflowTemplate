@@ -977,11 +977,11 @@ three_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree
 grDevices::dev.off()
 
 
-overlaps_onetwo_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree, "Two" = sig_TwoThree))
+overlaps_onetwo_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol))
 
-overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree,
-                                                              "Two" = sig_TwoThree,
-                                                              "Four" = sig_FourThree))
+overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree$MGI_Symbol,
+                                                              "Two" = sig_TwoThree$MGI_Symbol,
+                                                              "Four" = sig_FourThree$MGI_Symbol))
 ```
 
 ## Gene Ontology Based Analysis
