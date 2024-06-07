@@ -961,17 +961,17 @@ You can also create a dataframe with the genes found in the intersections.
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/venndiagrams"))
 
-two_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree, "Two" = sig_TwoThree),
-                                         plt_title = "# DEGs shared vs. Three",
-                                         edgecolor = c(group1_color, group2_color),
-                                         showintersects = TRUE)
+two_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol),
+                                                     plt_title = "# DEGs shared vs. Three",
+                                                     edgecolor = c(group1_color, group2_color),
+                                                     showintersects = TRUE)
 
-three_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree,
-                                                "Two" = sig_TwoThree,
-                                                "Four" = sig_FourThree),
-                                         plt_title = "# DEGs shared vs. Three",
-                                         edgecolor = c(group1_color, group2_color, group3_color),
-                                         showintersects = FALSE)
+three_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree$MGI_Symbol,
+                                                            "Two" = sig_TwoThree$MGI_Symbol,
+                                                            "Four" = sig_FourThree$MGI_Symbol),
+                                                       plt_title = "# DEGs shared vs. Three",
+                                                       edgecolor = c(group1_color, group2_color, group3_color),
+                                                       showintersects = FALSE)
 
 #comment out if you don't want to export images
 grDevices::dev.off()
@@ -980,8 +980,8 @@ grDevices::dev.off()
 overlaps_onetwo_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree, "Two" = sig_TwoThree))
 
 overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree,
-                                                "Two" = sig_TwoThree,
-                                                "Four" = sig_FourThree))
+                                                              "Two" = sig_TwoThree,
+                                                              "Four" = sig_FourThree))
 ```
 
 ## Gene Ontology Based Analysis
