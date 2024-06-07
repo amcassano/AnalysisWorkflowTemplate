@@ -961,12 +961,12 @@ You can also create a dataframe with the genes found in the intersections.
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/venndiagrams"))
 
-two_comp_venndiagram <- plot_venndiagram(list("One" = sig_OneThree, "Two" = sig_TwoThree),
+two_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree, "Two" = sig_TwoThree),
                                          plt_title = "# DEGs shared vs. Three",
                                          edgecolor = c(group1_color, group2_color),
                                          showintersects = TRUE)
 
-three_comp_venndiagram <- plot_venndiagram(list("One" = sig_OneThree,
+three_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree,
                                                 "Two" = sig_TwoThree,
                                                 "Four" = sig_FourThree),
                                          plt_title = "# DEGs shared vs. Three",
@@ -977,9 +977,9 @@ three_comp_venndiagram <- plot_venndiagram(list("One" = sig_OneThree,
 grDevices::dev.off()
 
 
-overlaps_onetwo_vsthree <- venn_overlaps(list("One" = sig_OneThree, "Two" = sig_TwoThree))
+overlaps_onetwo_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree, "Two" = sig_TwoThree))
 
-overlaps_onetwofour_vsthree <- venn_overlaps(list("One" = sig_OneThree,
+overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree,
                                                 "Two" = sig_TwoThree,
                                                 "Four" = sig_FourThree))
 ```
@@ -1022,15 +1022,15 @@ If you're using KEGG GSEA your annotated dataframe must include EntrezID
     -   `ontol` -\> optional; string; defaults to `"ALL"`; one of `"ALL"`, `"BP"`, `"CC"`, or `"MF"` these mean including all ontologies, just biological processes, cell components, or molecular functions
 
 ```{r gsea_ora, eval=TRUE}
-one_vs_two_GSEA <- go_GSEA(degs = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
-one_vs_two_ORA <- go_ORA(deg_df = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
-one_vs_two_FC <- getFoldChanges(one_vs_two)
-one_vs_two_sigFC <- getFoldChanges(sig_one_vs_two)
+one_vs_two_GSEA <- analyzeRNA::go_GSEA(degs = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
+one_vs_two_ORA <- analyzeRNA::go_ORA(deg_df = one_vs_two, pval_cutoff = 0.05, ontol = "BP")
+one_vs_two_FC <- analyzeRNA::getFoldChanges(one_vs_two)
+one_vs_two_sigFC <- analyzeRNA::getFoldChanges(sig_one_vs_two)
 
 # if you want to export the results
 one_vs_two_GSEAresults <- one_vs_two_GSEA@result
 setwd(output_dir)
-export_genelist(one_vs_two_GSEAresults, "One_vs_two_GSEA_results")
+analyzeRNA::export_genelist(one_vs_two_GSEAresults, "One_vs_two_GSEA_results")
 ```
 
 ### GSEA/ORA
@@ -1090,7 +1090,7 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_cluster_plots"))
 
-gseClusterPlot <- makeGSEplot(
+gseClusterPlot <- analyzeRNA::makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
     plot_type = "cluster"
@@ -1108,7 +1108,7 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_heat_plots"), width = 50)
 
-gseHeatPlot <- makeGSEplot(
+gseHeatPlot <- analyzeRNA::makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
     plot_type = "heat"
@@ -1126,7 +1126,7 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_upset_plots"))
 
-gseUpsetPlot <- makeGSEplot(
+gseUpsetPlot <- analyzeRNA::makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
     plot_type = "upset"
@@ -1144,7 +1144,7 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_tree_plots"), height = 12)
 
-gseTreePlot <- makeGSEplot(
+gseTreePlot <- analyzeRNA::makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
     plot_type = "tree"
@@ -1162,7 +1162,7 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_trad_plots"))
 
-gseTradPlot <- makeGSEplot(
+gseTradPlot <- analyzeRNA::makeGSEplot(
     GSE_obj = one_vs_two_GSEA,
     plot_title = "1 vs 2 GSEA",
     plot_type = "traditional"
@@ -1180,7 +1180,7 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_category_plots"))
 
-catplot <- categorynetplot(
+catplot <- analyzeRNA::categorynetplot(
     go_obj = one_vs_two_GSEA,
     deg_df = one_vs_two,
     pval_cutoff = 0.01, # defaults to 0.05
@@ -1231,7 +1231,7 @@ You can also take the top x number of significantly changed genes in some compar
 grDevices::pdf(file = paste0(output_dir, "/heatmaps"))
 
 # make a heatmap from genes saved in a CSV
-oxphos_heatmap <- heatmapFromCSV(
+oxphos_heatmap <- analyzeRNA::heatmapFromCSV(
     plottitle = "Oxidative Phosphorlyation Genes",
     fname = paste(genelist_dir, "oxphos.csv", sep = "/"),
     met = meta,
@@ -1246,7 +1246,7 @@ oxphos_heatmap
 
 # make a heatmap from genes from multiple CSVs
 # first create a dataframe consolidating all the genelists of interest
-cellprolif <- consolidate_gene_list(
+cellprolif <- analyzeRNA::consolidate_gene_list(
     map = gmap,
     paste(genelist_dir, "cell_division.csv", "/"),
     paste(genelist_dir, "cell_proliferation.csv", "/"),
@@ -1254,7 +1254,7 @@ cellprolif <- consolidate_gene_list(
     paste(genelist_dir, "chromosome_segregation.csv", "/")
 )
 
-prolif_heatmap <- heatmapFromDF(
+prolif_heatmap <- analyzeRNA::heatmapFromDF(
     plottitle = "Cell Division and Proliferation",
     genelist = cellprolif,
     met = meta,
@@ -1276,7 +1276,7 @@ top_genes <- rbind(
 )
 top_genes <- dplyr::distinct(top_genes, MGI_Symbol, .keep_all = TRUE)
 
-top_heatmap <- heatmapFromDF(
+top_heatmap <- analyzeRNA::heatmapFromDF(
     plottitle = "Top 15 genes from each comparison",
     genelist = top_genes,
     met = meta,
@@ -1295,16 +1295,16 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/go_group_heatmaps"))
 
-go_groups2 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% tibble::remove_rownames()
+go_groups2 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% tibble::remove_rownames()
 
-go_groups3 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3) %>% tibble::remove_rownames()
+go_groups3 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3) %>% tibble::remove_rownames()
 
-go_groups4 <- goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4) %>% tibble::remove_rownames()
+go_groups4 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4) %>% tibble::remove_rownames()
 
 #get the genes in any of these go groups by the row number.
 
-f <- genelistFromGOGroup(go_groups3, 1)
-heatmapFromDF("GO Group", f, meta, rlog_df, anno_colors, gaps = c(5), height = 8)
+f <- analyzeRNA::genelistFromGOGroup(go_groups3, 1)
+analyzeRNA::heatmapFromDF("GO Group", f, meta, rlog_df, anno_colors, gaps = c(5), height = 8)
 
 #comment out if you don't want to export images
 grDevices::dev.off()
