@@ -72,6 +72,7 @@ install.packages("ggalt")
 install.packages("ggpubr")
 install.packages("ggridges")
 install.packages("ggupset")
+install.packages("limma")
 install.packages("ggVennDiagram")
 install.packages("knitr")
 install.packages("paleteer")
@@ -133,6 +134,7 @@ library(tinytex)
 library(stats)
 library(enrichplot)
 library(clusterProfiler)
+library(limma)
 library(DOSE)
 library(org.Mm.eg.db)
 library(ggpubr)
@@ -1211,6 +1213,13 @@ KEGG pathways are more focused on gene groups that have been associated with dis
 For KEGG analyses you will need a dataframe that has EntrezID as a column.
 If you don't already, go back up and create a second genemap & set of annotated dataframes that include EntrezID.
 You should also make significant DEG dataframes but set `entrezeid = TRUE` in the `signif_deg` function.
+
+```{r kegg}
+#remember! you must use the dataframes with the EntrezID here (and not for anythin else)
+
+
+
+```
 
 ### Revigo
 
