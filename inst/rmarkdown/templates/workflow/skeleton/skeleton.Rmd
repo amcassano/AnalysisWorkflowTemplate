@@ -481,7 +481,7 @@ The genes that will have an NA P value will be the same for all comparisons.
 #only run this line once, if you run it more than once you will get an error message
 rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
 
-#
+# for this line of code the only thing you need to do is change `one_vs_two` to be one of your pairwise comparisons
 rlog_df <- dplyr::filter(rlog_df, GeneID %in% one_vs_two$GeneID)
 ```
 
