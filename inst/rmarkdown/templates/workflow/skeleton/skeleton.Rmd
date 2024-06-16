@@ -58,7 +58,7 @@ All of the functions from the `analyzeRNA` package (and all functions generally)
 
 [**Do not edit this chunk (just hit the run chunk button if needed)**]{style="color: red"}
 
-```{r install_pkgs, eval=FALSE, message=FALSE, warning=FALSE}
+```{r install_pkgs, eval=FALSE, message=FALSE}
 install.packages("BiocManager")
 install.packages("tidyverse")
 install.packages("ggplot2")
@@ -112,7 +112,7 @@ Leave this chunk as `eval=TRUE`
 
 [**Do not edit this chunk**]{style="color: red"}
 
-```{r load_pkgs, eval=TRUE, message=FALSE, warning=FALSE}
+```{r load_pkgs, eval=TRUE, message=FALSE}
 library(devtools)
 library(roxygen2)
 library(tidyverse)
@@ -511,8 +511,12 @@ allgenes <- dplyr::select(rlog_df, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,
     GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description")
 ) 
-# change GMattributes if desired, be warned though if you add EntrezID you'll need to adjust things further down to reflect that
-# If you wnat to do KEGG analysis you will need the EntrezIDs, i would recommend creating 2 annotated dataframes for ease of future use
+
+gmap_entrezid <- analyzeRNA::createGenemap(allgenes,
+    GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description", "entrezgene_id")
+    )
+# if you want entrez id  you'll need to adjust things further down to reflect that
+# If you wnat to do KEGG analysis you will need the EntrezIDs, i would recommend creating 2 sets of annotated dataframes for ease of future use
 ```
 
 ## Annotate pairwise comparisons (DEGs)
