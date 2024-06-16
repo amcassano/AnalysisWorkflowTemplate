@@ -474,9 +474,14 @@ According to the documentation \> "By default, independent filtering is performe
 Therefore, we will want to remove those same genes from the `rlog_df`.
 The code below will accomplish this.
 Change the name of the object `one_vs_two` to reflect one of your pairwise comparisons.
+You only need to do this with one of your pairwise comparisons.
+The genes that will have an NA P value will be the same for all comparisons.
 
 ```{r remove_NAs}
+#only run this line once, if you run it more than once you will get an error message
 rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
+
+#
 rlog_df <- dplyr::filter(rlog_df, GeneID %in% one_vs_two$GeneID)
 ```
 
