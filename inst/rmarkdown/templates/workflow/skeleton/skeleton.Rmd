@@ -240,14 +240,14 @@ raw_counts <- dplyr::select(raw_counts, -Geneid)
 
 # set groups as factors
 meta$Group <- factor(meta$Group,
-    levels = c(
-        "group1",
-        "group2",
-        "group3",
-        "group4",
-        "group5",
-        "group6"
-    )
+                     levels = c(
+                       "group1",
+                       "group2",
+                       "group3",
+                       "group4",
+                       "group5",
+                       "group6"
+                     )
 )
 
 # pre-filtering
@@ -255,8 +255,8 @@ count_minimum <- 800
 numberofsamples <- 20
 raw_counts$row_sum <- apply(raw_counts, 1, sum)
 raw_counts <- raw_counts %>%
-    dplyr::filter(row_sum > count_minimum) %>%
-    dplyr::select(-c(row_sum))
+  dplyr::filter(row_sum > count_minimum) %>%
+  dplyr::select(-c(row_sum))
 
 # set the sample ID as the row name for the metadata
 rownames(meta) <- meta$SampleID
@@ -281,14 +281,14 @@ meta$Group <- recode_factor(meta$Group, group3 = "new name 3")
 
 # refactor groups
 meta$Group <- factor(meta$Group,
-    levels = c(
-        "new name 1",
-        "New name 2",
-        "new name 3",
-        "group4",
-        "group5",
-        "group6"
-    )
+                     levels = c(
+                       "new name 1",
+                       "New name 2",
+                       "new name 3",
+                       "group4",
+                       "group5",
+                       "group6"
+                     )
 )
 ```
 
@@ -315,8 +315,8 @@ meta$Group <- factor(meta$Group,
 # get the names of the groups to assign to the colors/shapes
 sample_labels <- (meta$Group)
 group_labels <- unique(sample_labels) %>%
-    sort() %>%
-    print()
+  sort() %>%
+  print()
 
 analyzeRNA::getPalettes()
 ```
@@ -325,23 +325,23 @@ analyzeRNA::getPalettes()
 
 ```{r set_aesthetics, eval=TRUE}
 plot_aes <- analyzeRNA::set_aes(
-    group_labels,
-    c("shape1", "shape2", "shape3"),
-    c("outline1", "outline2", "outline3"),
-    c("fill1", "fill2", "fill3")
+  group_labels,
+  c("shape1", "shape2", "shape3"),
+  c("outline1", "outline2", "outline3"),
+  c("fill1", "fill2", "fill3")
 )
 
 # for heatmaps - be sure to change group1 group2 etc to the names of your conditions
 # make sure the order is correct
 anno_colors <- list(
-    Group = c(
-        group1 = as.character(plot_aes$outlineID[1]),
-        group2 = as.character(plot_aes$outlineID[2]),
-        group3 = as.character(plot_aes$outlineID[3]),
-        group4 = as.character(plot_aes$outlineID[4]),
-        group5 = as.character(plot_aes$outlineID[5]),
-        group6 = as.character(plot_aes$outlineID[6])
-    )
+  Group = c(
+    group1 = as.character(plot_aes$outlineID[1]),
+    group2 = as.character(plot_aes$outlineID[2]),
+    group3 = as.character(plot_aes$outlineID[3]),
+    group4 = as.character(plot_aes$outlineID[4]),
+    group5 = as.character(plot_aes$outlineID[5]),
+    group6 = as.character(plot_aes$outlineID[6])
+  )
 )
 
 #change the names here to match your conditions, make sure the order is correct
@@ -451,21 +451,21 @@ rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
 resultsNames(dseq)
 
 one_vs_two <- analyzeRNA::pairwiseDEGresults(
-    numerator = "comparisongroup",
-    denominator = "baselinegroup",
-    deseq_obj = dseq
+  numerator = "comparisongroup",
+  denominator = "baselinegroup",
+  deseq_obj = dseq
 )
 
 two_vs_three <- analyzeRNA::pairwiseDEGresults(
-    numerator = "othergroup",
-    denominator = "anotherone",
-    deseq_obj = dseq
+  numerator = "othergroup",
+  denominator = "anotherone",
+  deseq_obj = dseq
 )
 
 one_vs_three <- analyzeRNA::pairwiseDEGresults(
-    numerator = "comparisongroup",
-    denominator = "anotherone",
-    deseq_obj = dseq
+  numerator = "comparisongroup",
+  denominator = "anotherone",
+  deseq_obj = dseq
 )
 
 ```
@@ -509,14 +509,19 @@ The genemap will create a data frame that includes all of the Ensembl Gene IDs i
 ```{r make_genemap, eval=TRUE}
 allgenes <- dplyr::select(rlog_df, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,
-    GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description")
+                                  GMattributes = c("ensembl_gene_id", 
+                                                   "mgi_symbol", 
+                                                   "mgi_description")
 ) 
 
 gmap_entrezid <- analyzeRNA::createGenemap(allgenes,
-    GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description", "entrezgene_id")
-    )
+                                           GMattributes = c("ensembl_gene_id", 
+                                                            "mgi_symbol", 
+                                                            "mgi_description", 
+                                                            "entrezgene_id")
+)
 # if you want entrez id  you'll need to adjust things further down to reflect that
-# If you wnat to do KEGG analysis you will need the EntrezIDs, i would recommend creating 2 sets of annotated dataframes for ease of future use
+# If you wnat to do KEGG analysis you will need the EntrezIDs, i would recommend creating 2 sets of  annotated dataframes for ease of future use
 ```
 
 ## Annotate pairwise comparisons (DEGs)
@@ -529,27 +534,40 @@ gmap_entrezid <- analyzeRNA::createGenemap(allgenes,
 [**Add all of your pairwise comparisons, so all of your results get annotated**]{style="color: red"}
 
 ```{r annotate_rlog, eval=TRUE}
+#if you also want to have entrez id dataframes just add them ABOVE the regular annotations.
+# you must run these first because you'll save them to a different name but the regular annotation will overwrite the object
+rlog_df_entrezid <- analyzeRNA::annotate_biomart(rlog_df,
+                                                 gmap_entrezid, 
+                                                 gmattri = c("MGI_Symbol", "MGI_Desc", "EntrezID"))
+
 rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
-    gmap, # dont change this
-    gmattri = c("MGI_Symbol", "MGI_Desc")
-) # change this if you changed whats in the annotation
+                                        gmap, # dont change this
+                                        gmattri = c("MGI_Symbol", "MGI_Desc")
+) 
 ```
 
 ```{r annotate_degs, eval=TRUE}
+
+#if you want to do entrezid for kegg analysis run each annotation with kegg first!
+
+one_vs_two_entrezid <- analyzeRNA::annotate_biomart(one_vs_two,
+                                                    gmap_entrezid,
+                                                    gmattri = c("MGI_Symbol", "MGI_Desc", "EntrezID"))
+
 one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two,
-    gmap, # dont change this
-    gmattri = c("MGI_Symbol", "MGI_Desc")
-) # change this if you changed whats in the annotation
+                                           gmap, # dont change this
+                                           gmattri = c("MGI_Symbol", "MGI_Desc")
+) 
 
 two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three,
-    gmap, # dont change this
-    gmattri = c("MGI_Symbol", "MGI_Desc")
-) # change this if you changed whats in the annotation
+                                             gmap, # dont change this
+                                             gmattri = c("MGI_Symbol", "MGI_Desc")
+) 
 
 one_vs_three <- analyzeRNA::annotate_biomart(one_vs_three,
-    gmap, # dont change this
-    gmattri = c("MGI_Symbol", "MGI_Desc")
-) # change this if you changed whats in the annotation
+                                             gmap, # dont change this
+                                             gmattri = c("MGI_Symbol", "MGI_Desc")
+) 
 
 
 ```
@@ -589,19 +607,24 @@ l2fc_threshold <- 0.8
 
 # create ranked and filtered list of dif expr genes
 sig_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
-    padj_threshold,
-    l2fc_threshold
+                                     padj_threshold,
+                                     l2fc_threshold
 )
 
 sig_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
-    padj_threshold,
-    l2fc_threshold
+                                       padj_threshold,
+                                       l2fc_threshold
 )
 
 sig_OneThree <- analyzeRNA::signif_deg(one_vs_three,
-    padj_threshold,
-    l2fc_threshold
+                                       padj_threshold,
+                                       l2fc_threshold
 )
+
+#if doing kegg also do the same for those 
+sig_OneTwo_entrezid <- analyzeRNA::signif_deg(one_vs_two_entrezid,
+                                              padj_threshold,
+                                              l2fc_threshold)
 ```
 
 This chunk will create a filtered dataframe only containing genes that reach your specified significance threshold in your specified pairwise comparisons.This will filter out genes that aren't at all different in any of the pairwise comparisons of interest.
@@ -609,7 +632,9 @@ This removes some of the noise from genes that have reads but dont change.
 
 ```{r filtered_rlogdf}
 #add any/all pairwise comparisons (not the significant version) to the end of the function call
-sig_rlog <- analyzeRNA::rlog_filtering(p_thresh = 0.1, fc_thresh = 0.4, rlogdf = rlog_df, one_vs_two, two_vs_three)
+sig_rlog <- analyzeRNA::rlog_filtering(p_thresh = 0.1, 
+                                       fc_thresh = 0.4, 
+                                       rlogdf = rlog_df, one_vs_two, two_vs_three)
 ```
 
 # Export lists of significantly DEGs
@@ -630,21 +655,21 @@ You can also export a full (unfiltered) gene list if you want, but to export tha
 setwd(output_dir)
 
 analyzeRNA::export_genelist(sig_OneTwo,
-    filename = "1vs2",
-    direction = "up"
+                            filename = "1vs2",
+                            direction = "up"
 )
 
 analyzeRNA::export_genelist(sig_OneTwo,
-    filename = "1vs2",
-    direction = "down"
+                            filename = "1vs2",
+                            direction = "down"
 )
 
 analyzeRNA::export_genelist(sig_OneTwo,
-    filename = "1vs2"
+                            filename = "1vs2"
 )
 
 analyzeRNA::export_genelist(one_vs_two,
-    filename = "1vs2unfiltered"
+                            filename = "1vs2unfiltered"
 )
 ```
 
@@ -720,14 +745,14 @@ grDevices::pdf(file = paste0(output_dir, "/PCA_analyses"))
 # run the function
 # there is a ton of customizability in my fancy new code, take a peek at the function help to see what paramters you can change
 analyzeRNA::pca_analysis(
-    norm_df = rlog_df,
-    plot_aes = plot_aes,
-    metadat = meta,
-    varianceRemove = 0.85,
-    draw_polygon = TRUE,
-    draw_ellipses = FALSE,
-    label_samples = FALSE,
-    pcs = c("PC1", "PC2")
+  norm_df = rlog_df,
+  plot_aes = plot_aes,
+  metadat = meta,
+  varianceRemove = 0.85,
+  draw_polygon = TRUE,
+  draw_ellipses = FALSE,
+  label_samples = FALSE,
+  pcs = c("PC1", "PC2")
 )
 
 # see how much variance is explained by each PC
@@ -787,14 +812,14 @@ grDevices::pdf(file = paste0(output_dir, "/UMAP"))
 
 set.seed(5)
 rlogUMAP <- analyzeRNA::umap_analysis(
-    dseq_transform = rlog_norm,
-    neighbors = 3,
-    m_dist = 0.5,
-    cond_list = sample_labels,
-    plot_aes = plot_aes,
-    plot_title = "rlog Normalized UMAP",
-    batch = TRUE,
-    label_samples = FALSE
+  dseq_transform = rlog_norm,
+  neighbors = 3,
+  m_dist = 0.5,
+  cond_list = sample_labels,
+  plot_aes = plot_aes,
+  plot_title = "rlog Normalized UMAP",
+  batch = TRUE,
+  label_samples = FALSE
 )
 
 rlogUMAP
@@ -832,25 +857,25 @@ grDevices::pdf(file = paste0(output_dir, "/plot_counts"))
 
 # edit this so that its the right comparisons
 statcomps <- list(
-    c("Naive", "Tolerant"),
-    c("Naive", "Rejection"),
-    c("Tolerant", "Rejection")
+  c("Naive", "Tolerant"),
+  c("Naive", "Rejection"),
+  c("Tolerant", "Rejection")
 )
 
 analyzeRNA::plot_genecounts(
-    "Pdcd1",
-    rlog_df,
-    meta,
-    plot_aes
+  "Pdcd1",
+  rlog_df,
+  meta,
+  plot_aes
 )
 
 analyzeRNA::plot_genecounts(
-    mgi = "Tox",
-    norm_df = rlog_df,
-    metadat = meta,
-    plot_aes = plot_aes,
-    comparisons = statcomps,
-    yaxistozero = TRUE
+  mgi = "Tox",
+  norm_df = rlog_df,
+  metadat = meta,
+  plot_aes = plot_aes,
+  comparisons = statcomps,
+  yaxistozero = TRUE
 )
 
 #comment out if you don't want to export images
@@ -883,21 +908,21 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/volcano_plots"))
 
 analyzeRNA::volcano_plot(
-    deg_df = one_vs_two,
-    plotTitle = "One vs Two",
-    cond1 = "One",
-    cond2 = "Two"
+  deg_df = one_vs_two,
+  plotTitle = "One vs Two",
+  cond1 = "One",
+  cond2 = "Two"
 )
 
 analyzeRNA::volcano_plot(
-    deg_df = two_vs_three,
-    plotTitle = "Two vs Three",
-    cond1 = "Two",
-    cond2 = "Three",
-    l2fc_cutoff = 1.5,
-    pval_cutoff = 0.05,
-    dircolors = c("green", "red", "gray70"),
-    dirshapes = c(24, 25, 19)
+  deg_df = two_vs_three,
+  plotTitle = "Two vs Three",
+  cond1 = "Two",
+  cond2 = "Three",
+  l2fc_cutoff = 1.5,
+  pval_cutoff = 0.05,
+  dircolors = c("green", "red", "gray70"),
+  dirshapes = c(24, 25, 19)
 )
 
 #comment out if you don't want to export images
@@ -913,12 +938,12 @@ Say that you want to compare the DEGs from two different pairwise comparisons - 
 grDevices::pdf(file = paste0(output_dir, "/comp_volcanoplot"))
 
 analyzeRNA::comp_volcano(
-    deg_df1 = one_vs_three,
-    deg_df2 = two_vs_three,
-    plotTitle = "Compare these",
-    conditions = c("one", "three", "two", "three"),
-    l2fc_cutoff = 1.2,
-    pval_cutoff = 0.35
+  deg_df1 = one_vs_three,
+  deg_df2 = two_vs_three,
+  plotTitle = "Compare these",
+  conditions = c("one", "three", "two", "three"),
+  l2fc_cutoff = 1.2,
+  pval_cutoff = 0.35
 )
 
 #comment out if you don't want to export images
@@ -930,19 +955,19 @@ You can use this chunk to generate a dataframe of this comparison and to export 
 ```{r compareDEGs}
 setwd(output_dir)
 one_two_vs_three <- analyzeRNA::compareDEGlists(
-    deg_df1 = one_vs_three,
-    deg_df2 = two_vs_three,
-    conditions = c("one", "three", "two", "three"),
-    l2fc_cutoff = 1.2, pval_cutoff = 0.35,
-    export = FALSE
+  deg_df1 = one_vs_three,
+  deg_df2 = two_vs_three,
+  conditions = c("one", "three", "two", "three"),
+  l2fc_cutoff = 1.2, pval_cutoff = 0.35,
+  export = FALSE
 )
 
 onevthree_twovfour <- analyzeRNA::compareDEGlists(
-    deg_df1 = one_vs_three,
-    deg_df2 = two_vs_four,
-    conditions = c("one", "three", "two", "four"),
-    l2fc_cutoff = 1.2, pval_cutoff = 0.35,
-    export = TRUE
+  deg_df1 = one_vs_three,
+  deg_df2 = two_vs_four,
+  conditions = c("one", "three", "two", "four"),
+  l2fc_cutoff = 1.2, pval_cutoff = 0.35,
+  export = TRUE
 )
 ```
 
@@ -1062,12 +1087,12 @@ This plot displays the top 50 genes by gene ratio (\# genes related to GO term /
 grDevices::pdf(file = paste0(output_dir, "/GSEA_dot_plots"))
 
 gseDotPlot <- makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "dot",
-    categories_to_show = 35, # defaults to 30
-    label_length = 65, # defaults to 75
-    fontsize = 10
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "dot",
+  categories_to_show = 35, # defaults to 30
+  label_length = 65, # defaults to 75
+  fontsize = 10
 ) # defaults to 9
 
 gseDotPlot
@@ -1086,9 +1111,9 @@ I personally think that this is a more useful plot than the dot plot.
 grDevices::pdf(file = paste0(output_dir, "/GSEA_ridge_plots"))
 
 gseRidgePlot <- makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "ridge"
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "ridge"
 )
 
 gseRidgePlot
@@ -1104,9 +1129,9 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/GSEA_cluster_plots"))
 
 gseClusterPlot <- analyzeRNA::makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "cluster"
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "cluster"
 )
 
 gseClusterPlot
@@ -1122,9 +1147,9 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/GSEA_heat_plots"), width = 50)
 
 gseHeatPlot <- analyzeRNA::makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "heat"
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "heat"
 )
 
 gseHeatPlot
@@ -1140,9 +1165,9 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/GSEA_upset_plots"))
 
 gseUpsetPlot <- analyzeRNA::makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "upset"
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "upset"
 )
 
 gseUpsetPlot
@@ -1158,9 +1183,9 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/GSEA_tree_plots"), height = 12)
 
 gseTreePlot <- analyzeRNA::makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "tree"
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "tree"
 )
 
 gseTreePlot
@@ -1176,9 +1201,9 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/GSEA_trad_plots"))
 
 gseTradPlot <- analyzeRNA::makeGSEplot(
-    GSE_obj = one_vs_two_GSEA,
-    plot_title = "1 vs 2 GSEA",
-    plot_type = "traditional"
+  GSE_obj = one_vs_two_GSEA,
+  plot_title = "1 vs 2 GSEA",
+  plot_type = "traditional"
 )
 
 gseTradPlot
@@ -1194,12 +1219,12 @@ grDevices::dev.off()
 grDevices::pdf(file = paste0(output_dir, "/GSEA_category_plots"))
 
 catplot <- analyzeRNA::categorynetplot(
-    go_obj = one_vs_two_GSEA,
-    deg_df = one_vs_two,
-    pval_cutoff = 0.01, # defaults to 0.05
-    l2fc_cutoff = 0.8, # defaults to 0.5
-    categories_to_show = 35, # defaults to 30
-    shape = "circle"
+  go_obj = one_vs_two_GSEA,
+  deg_df = one_vs_two,
+  pval_cutoff = 0.01, # defaults to 0.05
+  l2fc_cutoff = 0.8, # defaults to 0.5
+  categories_to_show = 35, # defaults to 30
+  shape = "circle"
 ) # defaults to "circle"
 
 catplot
@@ -1241,7 +1266,7 @@ analyzeRNA::revigoPlot(gsea_obj = one_vs_two_GSEA,
                        scoretype = "nes", # one of "pvalue", "qvalue", or "nes"
                        plttitle = "REVIGO plot",
                        sim_threshold = 0.7 #similarity threshold, for large change to 0.9, for small change to 0.5
-                       )
+)
 
 #comment out if you don't want to export images
 grDevices::dev.off()
@@ -1269,14 +1294,14 @@ grDevices::pdf(file = paste0(output_dir, "/heatmaps"))
 
 # make a heatmap from genes saved in a CSV
 oxphos_heatmap <- analyzeRNA::heatmapFromCSV(
-    plottitle = "Oxidative Phosphorlyation Genes",
-    fname = paste(genelist_dir, "oxphos.csv", sep = "/"),
-    met = meta,
-    counts_df = rlog_df,
-    annocolors = anno_colors,
-    clusterRows = TRUE, # defaults to TRUE
-    gaps = c(4, 6), # defaults to c(); insert gap this many col in, nice for separating groups
-    height = 8
+  plottitle = "Oxidative Phosphorlyation Genes",
+  fname = paste(genelist_dir, "oxphos.csv", sep = "/"),
+  met = meta,
+  counts_df = rlog_df,
+  annocolors = anno_colors,
+  clusterRows = TRUE, # defaults to TRUE
+  gaps = c(4, 6), # defaults to c(); insert gap this many col in, nice for separating groups
+  height = 8
 ) # defaults to 10, decreasing will make a more squished map, better for lots of genes
 
 oxphos_heatmap
@@ -1284,22 +1309,22 @@ oxphos_heatmap
 # make a heatmap from genes from multiple CSVs
 # first create a dataframe consolidating all the genelists of interest
 cellprolif <- analyzeRNA::consolidate_gene_list(
-    map = gmap,
-    paste(genelist_dir, "cell_division.csv", "/"),
-    paste(genelist_dir, "cell_proliferation.csv", "/"),
-    paste(genelist_dir, "nuclear_division.csv", "/"),
-    paste(genelist_dir, "chromosome_segregation.csv", "/")
+  map = gmap,
+  paste(genelist_dir, "cell_division.csv", "/"),
+  paste(genelist_dir, "cell_proliferation.csv", "/"),
+  paste(genelist_dir, "nuclear_division.csv", "/"),
+  paste(genelist_dir, "chromosome_segregation.csv", "/")
 )
 
 prolif_heatmap <- analyzeRNA::heatmapFromDF(
-    plottitle = "Cell Division and Proliferation",
-    genelist = cellprolif,
-    met = meta,
-    counts_df = rlog_df,
-    annocolors = anno_colors,
-    clusterRows = TRUE, # defaults to TRUE
-    gaps = c(3), # defaults to c()
-    height = 8
+  plottitle = "Cell Division and Proliferation",
+  genelist = cellprolif,
+  met = meta,
+  counts_df = rlog_df,
+  annocolors = anno_colors,
+  clusterRows = TRUE, # defaults to TRUE
+  gaps = c(3), # defaults to c()
+  height = 8
 ) # defaults to 10
 
 prolif_heatmap
@@ -1308,17 +1333,17 @@ prolif_heatmap
 # make a heatmap from the top x genes from whatever comparisons
 # you can add or subtract depending on your comparisons
 top_genes <- rbind(
-    dplyr::slice_head(sig_OneTwo, n = 15) %>% dplyr::select(MGI_Symbol),
-    dplyr::slice_head(sig_TwoThree, n = 15) %>% dplyr::select(MGI_Symbol)
+  dplyr::slice_head(sig_OneTwo, n = 15) %>% dplyr::select(MGI_Symbol),
+  dplyr::slice_head(sig_TwoThree, n = 15) %>% dplyr::select(MGI_Symbol)
 )
 top_genes <- dplyr::distinct(top_genes, MGI_Symbol, .keep_all = TRUE)
 
 top_heatmap <- analyzeRNA::heatmapFromDF(
-    plottitle = "Top 15 genes from each comparison",
-    genelist = top_genes,
-    met = meta,
-    counts_df = rlog_df,
-    annocolors = anno_colors
+  plottitle = "Top 15 genes from each comparison",
+  genelist = top_genes,
+  met = meta,
+  counts_df = rlog_df,
+  annocolors = anno_colors
 )
 
 
