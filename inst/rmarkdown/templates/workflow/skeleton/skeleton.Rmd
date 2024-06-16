@@ -58,7 +58,7 @@ All of the functions from the `analyzeRNA` package (and all functions generally)
 
 [**Do not edit this chunk (just hit the run chunk button if needed)**]{style="color: red"}
 
-```{r install_pkgs, eval=FALSE}
+```{r install_pkgs, eval=FALSE, message=FALSE, warning=FALSE}
 install.packages("BiocManager")
 install.packages("tidyverse")
 install.packages("ggplot2")
@@ -112,7 +112,7 @@ Leave this chunk as `eval=TRUE`
 
 [**Do not edit this chunk**]{style="color: red"}
 
-```{r load_pkgs, eval=TRUE}
+```{r load_pkgs, eval=TRUE, message=FALSE, warning=FALSE}
 library(devtools)
 library(roxygen2)
 library(tidyverse)
