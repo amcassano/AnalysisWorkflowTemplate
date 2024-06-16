@@ -508,7 +508,9 @@ The genemap will create a data frame that includes all of the Ensembl Gene IDs i
 allgenes <- dplyr::select(rlog_df, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,
     GMattributes = c("ensembl_gene_id", "mgi_symbol", "mgi_description")
-) # change this if desired, be warned though if you add EntrezID you'll need to adjust things further down to reflec that
+) 
+# change GMattributes if desired, be warned though if you add EntrezID you'll need to adjust things further down to reflect that
+# If you wnat to do KEGG analysis you will need the EntrezIDs, i would recommend creating 2 annotated dataframes for ease of future use
 ```
 
 ## Annotate pairwise comparisons (DEGs)
@@ -1200,6 +1202,16 @@ catplot
 grDevices::dev.off()
 ```
 
+### KEGG Analysis
+
+All of the above analysis uses the Gene Ontology annotations.
+You can also perform similar analyses with KEGG pathways.
+Gene Ontology (GO) pathways are split into three groups, biological processes (BP), molecular functions (MF), and cellular components (CC).
+KEGG pathways are more focused on gene groups that have been associated with diseases.
+For KEGG analyses you will need a dataframe that has EntrezID as a column.
+If you don't already, go back up and create a second genemap & set of annotated dataframes that include EntrezID.
+You should also make significant DEG dataframes but set `entrezeid = TRUE` in the `signif_deg` function.
+
 ### Revigo
 
 From <https://revigo.irb.hr/> - this code will help you see what similar pathways are represented in your GSEA data Often, the first however many pathways that are enriched in you GSE analysis will be similar.
@@ -1210,6 +1222,13 @@ The tree map and the cluster map are very helpful for this but this code also wi
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_revigo_plots"))
 
+analyzeRNA::revigoPlot(gsea_obj = one_vs_two_GSEA,
+                       ontol = "BP", #one of "BP", "MF" or "CC"
+                       plotkind = "tree", #one of "tree", "scatter", or "heat"
+                       scoretype = "nes", # one of "pvalue", "qvalue", or "nes"
+                       plttitle = "REVIGO plot",
+                       sim_threshold = 0.7 #similarity threshold, for large change to 0.9, for small change to 0.5
+                       )
 
 #comment out if you don't want to export images
 grDevices::dev.off()
