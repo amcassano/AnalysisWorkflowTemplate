@@ -740,7 +740,7 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 
 ```{r PCA_analysis, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/PCA_analyses"))
+grDevices::pdf(file = paste0(output_dir, "/PCA_analyses.pdf"))
 
 # run the function
 # there is a ton of customizability in my fancy new code, take a peek at the function help to see what paramters you can change
@@ -774,7 +774,7 @@ But you can't do things like see what is driving each PC or easily look at other
 
 ```{r other_pca_code}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/DEseq_PCA"))
+grDevices::pdf(file = paste0(output_dir, "/DEseq_PCA.pdf"))
 
 analyzeRNA::originalPCA(dseq_transform = rlog_norm,
                         plot_aes = plot_aes,
@@ -807,7 +807,7 @@ grDevices::dev.off()
 
 ```{r umapAnalysis, eval=FALSE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/UMAP"))
+grDevices::pdf(file = paste0(output_dir, "/UMAP.pdf"))
 
 
 set.seed(5)
@@ -853,7 +853,7 @@ The mgi argument must be spelled exactly as it is in the genemap and is case sen
 
 ```{r plot_counts, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/plot_counts"))
+grDevices::pdf(file = paste0(output_dir, "/plot_counts.pdf"))
 
 # edit this so that its the right comparisons
 statcomps <- list(
@@ -905,7 +905,7 @@ grDevices::dev.off()
 
 ```{r volcano_plots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/volcano_plots"))
+grDevices::pdf(file = paste0(output_dir, "/volcano_plots.pdf"))
 
 analyzeRNA::volcano_plot(
   deg_df = one_vs_two,
@@ -935,7 +935,7 @@ Say that you want to compare the DEGs from two different pairwise comparisons - 
 
 ```{r comparative_volcano, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/comp_volcanoplot"))
+grDevices::pdf(file = paste0(output_dir, "/comp_volcanoplot.pdf"))
 
 analyzeRNA::comp_volcano(
   deg_df1 = one_vs_three,
@@ -997,7 +997,7 @@ You can also create a dataframe with the genes found in the intersections.
 
 ```{r venn_diagrams}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/venndiagrams"))
+grDevices::pdf(file = paste0(output_dir, "/venndiagrams.pdf"))
 
 two_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol),
                                                      plt_title = "# DEGs shared vs. Three",
@@ -1084,7 +1084,7 @@ This plot displays the top 50 genes by gene ratio (\# genes related to GO term /
 
 ```{r gsea_dotplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_dot_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_dot_plots.pdf"))
 
 gseDotPlot <- makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1108,7 +1108,7 @@ I personally think that this is a more useful plot than the dot plot.
 
 ```{r gsea_ridgeplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_ridge_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_ridge_plots.pdf"))
 
 gseRidgePlot <- makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1126,7 +1126,7 @@ grDevices::dev.off()
 
 ```{r gsea_clusterplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_cluster_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_cluster_plots.pdf"))
 
 gseClusterPlot <- analyzeRNA::makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1144,7 +1144,7 @@ grDevices::dev.off()
 
 ```{r gsea_heatplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_heat_plots"), width = 50)
+grDevices::pdf(file = paste0(output_dir, "/GSEA_heat_plots.pdf"), width = 50)
 
 gseHeatPlot <- analyzeRNA::makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1162,7 +1162,7 @@ grDevices::dev.off()
 
 ```{r gsea_upsetplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_upset_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_upset_plots.pdf"))
 
 gseUpsetPlot <- analyzeRNA::makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1180,7 +1180,7 @@ grDevices::dev.off()
 
 ```{r gsea_treeplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_tree_plots"), height = 12)
+grDevices::pdf(file = paste0(output_dir, "/GSEA_tree_plots.pdf"), height = 12)
 
 gseTreePlot <- analyzeRNA::makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1198,7 +1198,7 @@ grDevices::dev.off()
 
 ```{r gsea_tradplots, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_trad_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_trad_plots.pdf"))
 
 gseTradPlot <- analyzeRNA::makeGSEplot(
   GSE_obj = one_vs_two_GSEA,
@@ -1216,7 +1216,7 @@ grDevices::dev.off()
 
 ```{r category_netplot, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_category_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_category_plots.pdf"))
 
 catplot <- analyzeRNA::categorynetplot(
   go_obj = one_vs_two_GSEA,
@@ -1258,7 +1258,7 @@ The tree map and the cluster map are very helpful for this but this code also wi
 
 ```{r revigo}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/GSEA_revigo_plots"))
+grDevices::pdf(file = paste0(output_dir, "/GSEA_revigo_plots.pdf"))
 
 analyzeRNA::revigoPlot(gsea_obj = one_vs_two_GSEA,
                        ontol = "BP", #one of "BP", "MF" or "CC"
@@ -1290,7 +1290,7 @@ You can also take the top x number of significantly changed genes in some compar
 
 ```{r heatmap_from_csv, eval=TRUE}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/heatmaps"))
+grDevices::pdf(file = paste0(output_dir, "/heatmaps.pdf"))
 
 # make a heatmap from genes saved in a CSV
 oxphos_heatmap <- analyzeRNA::heatmapFromCSV(
@@ -1355,7 +1355,7 @@ grDevices::dev.off()
 
 ```{r go_grouping_heatmaps}
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/go_group_heatmaps"))
+grDevices::pdf(file = paste0(output_dir, "/go_group_heatmaps.pdf"))
 
 go_groups2 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% tibble::remove_rownames()
 
