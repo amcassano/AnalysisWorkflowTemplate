@@ -168,9 +168,11 @@ setwd(primary_directory)
 
 # this is the folder that contains your CSV files containing raw counts and your meta data CSV
 raw_dir <- paste0(primary_directory, "/raw_input")
+if (!dir.exists(raw_dir)) { dir.create(raw_dir) }
 
 # this is the folder that contains your CSV files that are lists of MGI symbols of interest
 genelist_dir <- paste0(primary_directory, "/gene_lists")
+if (!dir.exists(genelist_dir)) { dir.create(genelist_dir) }
 
 # this code will create an output directory for you if it doesnt exist. this is where exported analyses will be saved
 output_dir <- paste0(primary_directory, "/analysis_outputs")
