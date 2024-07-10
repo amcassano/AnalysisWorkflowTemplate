@@ -254,7 +254,7 @@ meta$Group <- factor(meta$Group,
 
 # pre-filtering
 count_minimum <- 800
-numberofsamples <- 20
+
 raw_counts$row_sum <- apply(raw_counts, 1, sum)
 raw_counts <- raw_counts %>%
   dplyr::filter(row_sum > count_minimum) %>%
@@ -982,8 +982,7 @@ This should use the significant dataframes
 one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
   suffix_list = c(".one", ".two"),
   sig_OneThree,
-  sig_TwoThree,
-  samedir = TRUE)
+  sig_TwoThree)
 
 ```
 
