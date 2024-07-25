@@ -233,7 +233,7 @@ This code will accomplish a few things in order to get the files in the format n
     This is done to filter out genes that have a high read count for just one sample, but are not expressed in other samples.
     This minimizes noise and removes outliers.
 
-[**Change the group names, count minimum, number of samples**]{style="color: red"}
+[**Change the group names and count minimum**]{style="color: red"}
 
 ```{r csv_cleanup, eval=TRUE}
 # renames each row as the GeneID and removes the Geneid column
@@ -263,35 +263,6 @@ raw_counts <- raw_counts %>%
 # set the sample ID as the row name for the metadata
 rownames(meta) <- meta$SampleID
 meta <- meta %>% dplyr::select(-c(SampleID))
-```
-
-### Rename groups (optional)
-
-If you want to rename any groups from how they appear in your csv files (i.e. 'rej' -\> 'Acute Rejection') use the code below.
-
-If this is needed change `eval=FALSE` to `eval=TRUE` .
-Delete or add lines as needed.
-Replace `group1`, `group2` etc with the name of the group you want to change.
-Replace the text in quotes (`"new name 1"`) with what you want the new group name to be.
-Fill in the factoring list so that the new group names replace any old ones, include unchanged group names as well
-
-```{r rename_groups, eval=FALSE}
-# rename groups
-meta$Group <- recode_factor(meta$Group, group1 = "new name 1")
-meta$Group <- recode_factor(meta$Group, group2 = "New name 2")
-meta$Group <- recode_factor(meta$Group, group3 = "new name 3")
-
-# refactor groups
-meta$Group <- factor(meta$Group,
-                     levels = c(
-                       "new name 1",
-                       "New name 2",
-                       "new name 3",
-                       "group4",
-                       "group5",
-                       "group6"
-                     )
-)
 ```
 
 ## Set colors, shapes, labels for plots
@@ -425,11 +396,11 @@ rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
 -   **Pairwise comparison function inputs:**
 
     -   `numerator`-\> required; string; must match exactly as it's written in the DESeq object.
-        If unsure run just the `resultsNames(dseq)` line of code.
+        If unsure run just the `print_group_names(dseq)` chunk of code.
         (ex: "Tolerant", "Naive")
 
     -   `denominator` -\> required; string; must match exactly as it's written in the DESeq object.
-        If unsure run just the `resultsNames(dseq)` line of code.
+        If unsure run just the `print_group_names(dseq)` chunk of code.
         (ex: "Tolerant", "Naive")
 
     -   `dseq_obj` -\> required; DESeqObject; This is the DESeq object we saved two chunks above.
@@ -449,9 +420,11 @@ rlog_df <- as.data.frame(SummarizedExperiment::assay(rlog_norm))
 
 [**Add the desired comparisons, change the names of the numerator and denominator and the names of the objects you're storing the results in.**]{style="color: red"}
 
-```{r degs, eval=TRUE}
-resultsNames(dseq)
+```{r print_group_names}
+analyzeRNA::print_group_names(dseq)
+```
 
+```{r degs, eval=TRUE}
 one_vs_two <- analyzeRNA::pairwiseDEGresults(
   numerator = "comparisongroup",
   denominator = "baselinegroup",
@@ -952,7 +925,9 @@ analyzeRNA::comp_volcano(
 grDevices::dev.off()
 ```
 
-You can use this chunk to generate a dataframe of this comparison and to export it to CSVs
+You can use this chunk to generate a dataframe of this comparison and to export it to CSVs.
+This will show you genes significantly changed between only 2 comparisons and will include those going in opposite directions.
+For comparing more than 2 comparisons you can use the chunk below.
 
 ```{r compareDEGs}
 setwd(output_dir)
@@ -976,7 +951,8 @@ onevthree_twovfour <- analyzeRNA::compareDEGlists(
 ## Shared Genes within comaprisons
 
 This code will generate a dataframe containing the shared significantly changed genes between 2+ pairwise comparisons.
-This should use the significant dataframes
+This should use the significant dataframes.
+This will only include those genes changed in the same direction.
 
 ```{r shared_genes}
 one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
@@ -1358,11 +1334,9 @@ grDevices::dev.off()
 #if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/go_group_heatmaps.pdf"))
 
-go_groups2 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 2) %>% tibble::remove_rownames()
+go_groups3 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3) 
 
-go_groups3 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3) %>% tibble::remove_rownames()
-
-go_groups4 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4) %>% tibble::remove_rownames()
+go_groups4 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4) 
 
 #get the genes in any of these go groups by the row number.
 
