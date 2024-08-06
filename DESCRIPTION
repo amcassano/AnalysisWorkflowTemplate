@@ -1,11 +1,12 @@
 Package: AnalysisWorkflowTemplate
 Type: Package
-Title: What the Package Does (Title Case)
+Title: RNAseq Analysis Workflow Template
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: c(
+    person("Alexandra", "Cassano", , "acassano@uchicago.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3144-8716"))
+  )
+Description: Skeleton template for RNAseq analysis for the alegre lab. For use with analyzeRNA package
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
