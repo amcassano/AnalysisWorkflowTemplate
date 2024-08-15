@@ -100,7 +100,6 @@ BiocManager::install("PCAtools")
 
 devtools::install_github("JamesJoly/DGSEA")
 devtools::install_github("amcassano/RNAseqAnalysisPackage", upgrade = FALSE)
-
 ```
 
 ## Load packages
@@ -168,15 +167,21 @@ setwd(primary_directory)
 
 # this is the folder that contains your CSV files containing raw counts and your meta data CSV
 raw_dir <- paste0(primary_directory, "/raw_input")
-if (!dir.exists(raw_dir)) { dir.create(raw_dir) }
+if (!dir.exists(raw_dir)) {
+  dir.create(raw_dir)
+}
 
 # this is the folder that contains your CSV files that are lists of MGI symbols of interest
 genelist_dir <- paste0(primary_directory, "/gene_lists")
-if (!dir.exists(genelist_dir)) { dir.create(genelist_dir) }
+if (!dir.exists(genelist_dir)) {
+  dir.create(genelist_dir)
+}
 
 # this code will create an output directory for you if it doesnt exist. this is where exported analyses will be saved
 output_dir <- paste0(primary_directory, "/analysis_outputs")
-if (!dir.exists(output_dir)) { dir.create(output_dir) }
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir)
+}
 ```
 
 ## Data import & preparation
@@ -242,14 +247,14 @@ raw_counts <- dplyr::select(raw_counts, -Geneid)
 
 # set groups as factors
 meta$Group <- factor(meta$Group,
-                     levels = c(
-                       "group1",
-                       "group2",
-                       "group3",
-                       "group4",
-                       "group5",
-                       "group6"
-                     )
+  levels = c(
+    "group1",
+    "group2",
+    "group3",
+    "group4",
+    "group5",
+    "group6"
+  )
 )
 
 # pre-filtering
@@ -317,7 +322,7 @@ anno_colors <- list(
   )
 )
 
-#change the names here to match your conditions, make sure the order is correct
+# change the names here to match your conditions, make sure the order is correct
 group1_color <- as.character(plot_aes$outlineID[1])
 group2_color <- as.character(plot_aes$outlineID[2])
 group3_color <- as.character(plot_aes$outlineID[3])
@@ -442,7 +447,6 @@ one_vs_three <- analyzeRNA::pairwiseDEGresults(
   denominator = "anotherone",
   deseq_obj = dseq
 )
-
 ```
 
 The `pairwiseDEGresults` function calls the DESeq2 package's `results` function and removes any Genes that have a p-value of 'NA'.
@@ -455,7 +459,7 @@ You only need to do this with one of your pairwise comparisons.
 The genes that will have an NA P value will be the same for all comparisons.
 
 ```{r remove_NAs}
-#only run this line once, if you run it more than once you will get an error message
+# only run this line once, if you run it more than once you will get an error message
 rlog_df <- tibble::rownames_to_column(rlog_df, var = "GeneID")
 
 # for this line of code the only thing you need to do is change `one_vs_two` to be one of your pairwise comparisons (doesn't matter which one)
@@ -484,16 +488,20 @@ The genemap will create a data frame that includes all of the Ensembl Gene IDs i
 ```{r make_genemap, eval=TRUE}
 allgenes <- dplyr::select(rlog_df, GeneID)
 gmap <- analyzeRNA::createGenemap(allgenes,
-                                  GMattributes = c("ensembl_gene_id", 
-                                                   "mgi_symbol", 
-                                                   "mgi_description")
-) 
+  GMattributes = c(
+    "ensembl_gene_id",
+    "mgi_symbol",
+    "mgi_description"
+  )
+)
 
 gmap_entrezid <- analyzeRNA::createGenemap(allgenes,
-                                           GMattributes = c("ensembl_gene_id", 
-                                                            "mgi_symbol", 
-                                                            "mgi_description", 
-                                                            "entrezgene_id")
+  GMattributes = c(
+    "ensembl_gene_id",
+    "mgi_symbol",
+    "mgi_description",
+    "entrezgene_id"
+  )
 )
 # if you want entrez id  you'll need to adjust things further down to reflect that
 # If you wnat to do KEGG analysis you will need the EntrezIDs, i would recommend creating 2 sets of  annotated dataframes for ease of future use
@@ -509,42 +517,41 @@ gmap_entrezid <- analyzeRNA::createGenemap(allgenes,
 [**Add all of your pairwise comparisons, so all of your results get annotated**]{style="color: red"}
 
 ```{r annotate_rlog, eval=TRUE}
-#if you also want to have entrez id dataframes just add them ABOVE the regular annotations.
+# if you also want to have entrez id dataframes just add them ABOVE the regular annotations.
 # you must run these first because you'll save them to a different name but the regular annotation will overwrite the object
 rlog_df_entrezid <- analyzeRNA::annotate_biomart(rlog_df,
-                                                 gmap_entrezid, 
-                                                 gmattri = c("MGI_Symbol", "MGI_Desc", "EntrezID"))
+  gmap_entrezid,
+  gmattri = c("MGI_Symbol", "MGI_Desc", "EntrezID")
+)
 
 rlog_df <- analyzeRNA::annotate_biomart(rlog_df,
-                                        gmap, # dont change this
-                                        gmattri = c("MGI_Symbol", "MGI_Desc")
-) 
+  gmap, # dont change this
+  gmattri = c("MGI_Symbol", "MGI_Desc")
+)
 ```
 
 ```{r annotate_degs, eval=TRUE}
-
-#if you want to do entrezid for kegg analysis run each annotation with kegg first!
+# if you want to do entrezid for kegg analysis run each annotation with kegg first!
 
 one_vs_two_entrezid <- analyzeRNA::annotate_biomart(one_vs_two,
-                                                    gmap_entrezid,
-                                                    gmattri = c("MGI_Symbol", "MGI_Desc", "EntrezID"))
+  gmap_entrezid,
+  gmattri = c("MGI_Symbol", "MGI_Desc", "EntrezID")
+)
 
 one_vs_two <- analyzeRNA::annotate_biomart(one_vs_two,
-                                           gmap, # dont change this
-                                           gmattri = c("MGI_Symbol", "MGI_Desc")
-) 
+  gmap, # dont change this
+  gmattri = c("MGI_Symbol", "MGI_Desc")
+)
 
 two_vs_three <- analyzeRNA::annotate_biomart(two_vs_three,
-                                             gmap, # dont change this
-                                             gmattri = c("MGI_Symbol", "MGI_Desc")
-) 
+  gmap, # dont change this
+  gmattri = c("MGI_Symbol", "MGI_Desc")
+)
 
 one_vs_three <- analyzeRNA::annotate_biomart(one_vs_three,
-                                             gmap, # dont change this
-                                             gmattri = c("MGI_Symbol", "MGI_Desc")
-) 
-
-
+  gmap, # dont change this
+  gmattri = c("MGI_Symbol", "MGI_Desc")
+)
 ```
 
 # Filter & sort significant DEGs
@@ -581,35 +588,42 @@ padj_threshold <- 0.05
 l2fc_threshold <- 0.8
 
 # create ranked and filtered list of dif expr genes
-sig_OneTwo <- analyzeRNA::signif_deg(one_vs_two,
-                                     padj_threshold,
-                                     l2fc_threshold
+sig_OneTwo <- analyzeRNA::signif_deg(
+  one_vs_two,
+  padj_threshold,
+  l2fc_threshold
 )
 
-sig_TwoThree <- analyzeRNA::signif_deg(two_vs_three,
-                                       padj_threshold,
-                                       l2fc_threshold
+sig_TwoThree <- analyzeRNA::signif_deg(
+  two_vs_three,
+  padj_threshold,
+  l2fc_threshold
 )
 
-sig_OneThree <- analyzeRNA::signif_deg(one_vs_three,
-                                       padj_threshold,
-                                       l2fc_threshold
+sig_OneThree <- analyzeRNA::signif_deg(
+  one_vs_three,
+  padj_threshold,
+  l2fc_threshold
 )
 
-#if doing kegg also do the same for those 
-sig_OneTwo_entrezid <- analyzeRNA::signif_deg(one_vs_two_entrezid,
-                                              padj_threshold,
-                                              l2fc_threshold)
+# if doing kegg also do the same for those
+sig_OneTwo_entrezid <- analyzeRNA::signif_deg(
+  one_vs_two_entrezid,
+  padj_threshold,
+  l2fc_threshold
+)
 ```
 
 This chunk will create a filtered dataframe only containing genes that reach your specified significance threshold in your specified pairwise comparisons.This will filter out genes that aren't at all different in any of the pairwise comparisons of interest.
 This removes some of the noise from genes that have reads but dont change.
 
 ```{r filtered_rlogdf}
-#add any/all pairwise comparisons (not the significant version) to the end of the function call
-sig_rlog <- analyzeRNA::rlog_filtering(p_thresh = 0.1, 
-                                       fc_thresh = 0.4, 
-                                       rlogdf = rlog_df, one_vs_two, two_vs_three)
+# add any/all pairwise comparisons (not the significant version) to the end of the function call
+sig_rlog <- analyzeRNA::rlog_filtering(
+  p_thresh = 0.1,
+  fc_thresh = 0.4,
+  rlogdf = rlog_df, one_vs_two, two_vs_three
+)
 ```
 
 # Export lists of significantly DEGs
@@ -630,21 +644,21 @@ You can also export a full (unfiltered) gene list if you want, but to export tha
 setwd(output_dir)
 
 analyzeRNA::export_genelist(sig_OneTwo,
-                            filename = "1vs2",
-                            direction = "up"
+  filename = "1vs2",
+  direction = "up"
 )
 
 analyzeRNA::export_genelist(sig_OneTwo,
-                            filename = "1vs2",
-                            direction = "down"
+  filename = "1vs2",
+  direction = "down"
 )
 
 analyzeRNA::export_genelist(sig_OneTwo,
-                            filename = "1vs2"
+  filename = "1vs2"
 )
 
 analyzeRNA::export_genelist(one_vs_two,
-                            filename = "1vs2unfiltered"
+  filename = "1vs2unfiltered"
 )
 ```
 
@@ -714,7 +728,7 @@ analyzeRNA::sample_distances(rlog_norm, anno_colors, meta)
 [**Change the title and if you want to label the dots change it to TRUE**]{style="color: red"}
 
 ```{r PCA_analysis, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/PCA_analyses.pdf"))
 
 # run the function
@@ -737,7 +751,7 @@ PCAtools::screeplot(p)
 # see what is contributing to each PC, this is very helpful!
 PCAtools::plotloadings(p)
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -748,15 +762,17 @@ This uses the built in PCA from the `DESeq2` package.
 But you can't do things like see what is driving each PC or easily look at other PCs.
 
 ```{r other_pca_code}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/DEseq_PCA.pdf"))
 
-analyzeRNA::originalPCA(dseq_transform = rlog_norm,
-                        plot_aes = plot_aes,
-                        plot_title = "PCA",
-                        label_samples = FALSE)
+analyzeRNA::originalPCA(
+  dseq_transform = rlog_norm,
+  plot_aes = plot_aes,
+  plot_title = "PCA",
+  label_samples = FALSE
+)
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -781,7 +797,7 @@ grDevices::dev.off()
 [**you can change the seed around, play with the neighbors and m Dist, change the title and toggle labels**]{style="color: red"}
 
 ```{r umapAnalysis, eval=FALSE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/UMAP.pdf"))
 
 
@@ -799,7 +815,7 @@ rlogUMAP <- analyzeRNA::umap_analysis(
 
 rlogUMAP
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -826,8 +842,8 @@ The mgi argument must be spelled exactly as it is in the genemap and is case sen
 
 [**change the mgi symbol names & add as you wish. edit the optional variables as you wish and add comparisons as desired, the below are just examples**]{style="color: red"}
 
-```{r plot_counts, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+```{r plot_counts_single, eval=TRUE}
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/plot_counts.pdf"))
 
 # edit this so that its the right comparisons
@@ -837,23 +853,135 @@ statcomps <- list(
   c("Tolerant", "Rejection")
 )
 
-analyzeRNA::plot_genecounts(
-  "Pdcd1",
-  rlog_df,
-  meta,
-  plot_aes
-)
-
+# code for doing only one plot at a time
 analyzeRNA::plot_genecounts(
   mgi = "Tox",
   norm_df = rlog_df,
   metadat = meta,
   plot_aes = plot_aes,
+  label_samples = FALSE,
   comparisons = statcomps,
   yaxistozero = TRUE
 )
 
-#comment out if you don't want to export images
+
+# comment out if you don't want to export images
+grDevices::dev.off()
+```
+
+The code above will allow you to plot one MGI symbol at a time. If you want to create plots for many different genes at once use this chunk
+To do this, create a list of MGI symbols and the code will generate plots for all genes listed and run the mapping code to do all at once.
+The other arguments in the plot will be the same for all genes in the list. If you want to change around the stat comparisons listed for each of the plots check the chunk below this one
+```{r plot_counts_list}
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/plot_counts.pdf"))
+
+# edit this so that its the right comparisons
+statcomps <- list(
+  c("Naive", "Tolerant"),
+  c("Naive", "Rejection"),
+  c("Tolerant", "Rejection")
+)
+
+# Create a list of MGI symbols that you want to create plots for.
+# This must be spelled the exact way that it is in the genemap.Consult that if unsure.
+# This list can be as long as you want
+genes_to_plot <- list("Tox", "Pdcd1", "Batf", "Gata3")
+
+# do not edit this code **UNLESS** you have changed the name of/are using a different rlog_df, meta, plot_aes, or statcomps or want to edit the variables otheriwse
+map_genecounts <- function(i) {
+  analyzeRNA::plot_genecounts(
+    mgi = i,
+    norm_df = rlog_df,
+    metadat = meta,
+    plot_aes = plot_aes,
+    comparisons = statcomps,
+    yaxistozero = FALSE,
+    label_samples = FALSE,
+    pval_format = "p.signif"
+  )
+}
+
+# if you run the entire chunk with the first and last lines the plots will output to a pdf, otherwise they'll output in R
+purrr::map(genes_to_plot, map_genecounts)
+
+
+# comment out if you don't want to export images
+grDevices::dev.off()
+```
+
+If you want to have different stats for pairwise comparisons listed for different genes that you're plotting you'll use this
+You will create a list of MGI symbols the same way as above but you'll also create a separate list of comparisons.
+Since each comparison is a bit unwieldy I recommend creating a few variables to cover each possible comparison you're interested in.
+Then you can make a list using these variables.
+The lists need to be in the same order as each other and they also must be the same length.
+```
+```{r plot_counts_list2}
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/plot_counts.pdf"))
+
+# create your possible comparisons (include an empty list if you dont want comparisons on one of your plots)
+comparison1 <- list(
+  c("Naive", "Tolerant"),
+  c("Naive", "Rejection"),
+  c("Tolerant", "Rejection")
+)
+
+comparison2 <- list(
+  c("Tolerant", "Rejection")
+)
+
+comparison3 <- list(
+  c("Naive", "Tolerant"),
+  c("Naive", "Rejection")
+)
+
+comparison4 <- list()
+
+# now create a list of your comparisons that is in order corresponding to your list of gene names below.
+# the two lists MUST be the same length. You can reuse comparison variables if you want the same set of comparisons but you must include it at each spot you want it
+# as an example i've listed in comments which comparison matches with which gene below. Obviously if you change the lists this will no longer apply. You will need to adjust each thing so it fits your data. but make sure the orders correspond correctly
+comparisons_to_plot <- list(
+  comparison1, # corresponds to tox (first listed)
+  comparison3, # corresponds to pdcd1
+  comparison4, # corresponds to batf
+  comparison4, # corresponds to gata3
+  comparison2, # corresponds to jun
+  comparison1, # corresponds to tigit
+  comparison3 # corresponds to icos
+)
+# Create a list of MGI symbols that you want to create plots for.
+# This must be spelled the exact way that it is in the genemap.Consult that if unsure.
+# This list can be as long as you want
+genes_to_plot <- list(
+  "Tox", # corresponds to comparison1, (first listed)
+  "Pdcd1", # corresponds to comparison3
+  "Batf", # corresponds to comparison4
+  "Gata3", # corresponds to comparison4
+  "Jun", # corresponds to comparison2
+  "Tigit", # corresponds to comparison1
+  "Icos" # corresponds to comparison3
+)
+
+# do not edit this code **UNLESS** you have changed the name of/are using a different rlog_df, meta, plot_aes or want to edit the variables otheriwse
+map_genecounts_with_stats <- function(mgi_symbol, stat_comparison) {
+  analyzeRNA::plot_genecounts(
+    mgi = mgi_symbol,
+    norm_df = rlog_df,
+    metadat = meta,
+    plot_aes = plot_aes,
+    comparisons = stat_comparison,
+    yaxistozero = FALSE,
+    label_samples = FALSE,
+    pval_format = "p.signif"
+  )
+}
+
+# if you run the entire chunk with the first and last lines the plots will output to a pdf, otherwise they'll output in R
+purrr::map2(genes_to_plot, comparisons_to_plot, map_genecounts_with_stats)
+
+
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -879,7 +1007,7 @@ grDevices::dev.off()
     -   `dirshapes` -\> optional; list of 3 numbers; defaults to all circles; The shapes for up in condition 1, down in condition 1 and not significant. (ex. `c(18, 18, 19)`)
 
 ```{r volcano_plots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/volcano_plots.pdf"))
 
 analyzeRNA::volcano_plot(
@@ -900,7 +1028,7 @@ analyzeRNA::volcano_plot(
   dirshapes = c(24, 25, 19)
 )
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -909,7 +1037,7 @@ grDevices::dev.off()
 Say that you want to compare the DEGs from two different pairwise comparisons - here you can plot Log2 Change vs Log2 Fold Change
 
 ```{r comparative_volcano, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/comp_volcanoplot.pdf"))
 
 analyzeRNA::comp_volcano(
@@ -921,7 +1049,7 @@ analyzeRNA::comp_volcano(
   pval_cutoff = 0.35
 )
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -958,8 +1086,8 @@ This will only include those genes changed in the same direction.
 one_two_shared_vs_three <- analyzeRNA::get_shared_genes(
   suffix_list = c(".one", ".two"),
   sig_OneThree,
-  sig_TwoThree)
-
+  sig_TwoThree
+)
 ```
 
 ## Venn Diagrams
@@ -973,30 +1101,37 @@ For that, use the code above, or check the dataframe exported.
 You can also create a dataframe with the genes found in the intersections.
 
 ```{r venn_diagrams}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/venndiagrams.pdf"))
 
 two_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol),
-                                                     plt_title = "# DEGs shared vs. Three",
-                                                     edgecolor = c(group1_color, group2_color),
-                                                     showintersects = TRUE)
+  plt_title = "# DEGs shared vs. Three",
+  edgecolor = c(group1_color, group2_color),
+  showintersects = TRUE
+)
 
-three_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree$MGI_Symbol,
-                                                            "Two" = sig_TwoThree$MGI_Symbol,
-                                                            "Four" = sig_FourThree$MGI_Symbol),
-                                                       plt_title = "# DEGs shared vs. Three",
-                                                       edgecolor = c(group1_color, group2_color, group3_color),
-                                                       showintersects = FALSE)
+three_comp_venndiagram <- analyzeRNA::plot_venndiagram(
+  list(
+    "One" = sig_OneThree$MGI_Symbol,
+    "Two" = sig_TwoThree$MGI_Symbol,
+    "Four" = sig_FourThree$MGI_Symbol
+  ),
+  plt_title = "# DEGs shared vs. Three",
+  edgecolor = c(group1_color, group2_color, group3_color),
+  showintersects = FALSE
+)
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 
 
 overlaps_onetwo_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol))
 
-overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree$MGI_Symbol,
-                                                              "Two" = sig_TwoThree$MGI_Symbol,
-                                                              "Four" = sig_FourThree$MGI_Symbol))
+overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list(
+  "One" = sig_OneThree$MGI_Symbol,
+  "Two" = sig_TwoThree$MGI_Symbol,
+  "Four" = sig_FourThree$MGI_Symbol
+))
 ```
 
 ## Gene Ontology Based Analysis
@@ -1060,7 +1195,7 @@ The dot plot shows the number of genes associated with the first 50 terms (size)
 This plot displays the top 50 genes by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
 
 ```{r gsea_dotplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_dot_plots.pdf"))
 
 gseDotPlot <- makeGSEplot(
@@ -1074,7 +1209,7 @@ gseDotPlot <- makeGSEplot(
 
 gseDotPlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -1084,7 +1219,7 @@ ridge plots are a lot like dot plots but will show the enrichment distribution r
 I personally think that this is a more useful plot than the dot plot.
 
 ```{r gsea_ridgeplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_ridge_plots.pdf"))
 
 gseRidgePlot <- makeGSEplot(
@@ -1095,14 +1230,14 @@ gseRidgePlot <- makeGSEplot(
 
 gseRidgePlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 #### Cluster Plot
 
 ```{r gsea_clusterplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_cluster_plots.pdf"))
 
 gseClusterPlot <- analyzeRNA::makeGSEplot(
@@ -1113,14 +1248,14 @@ gseClusterPlot <- analyzeRNA::makeGSEplot(
 
 gseClusterPlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 #### Heat plot
 
 ```{r gsea_heatplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_heat_plots.pdf"), width = 50)
 
 gseHeatPlot <- analyzeRNA::makeGSEplot(
@@ -1131,14 +1266,14 @@ gseHeatPlot <- analyzeRNA::makeGSEplot(
 
 gseHeatPlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 #### Upset plot
 
 ```{r gsea_upsetplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_upset_plots.pdf"))
 
 gseUpsetPlot <- analyzeRNA::makeGSEplot(
@@ -1149,14 +1284,14 @@ gseUpsetPlot <- analyzeRNA::makeGSEplot(
 
 gseUpsetPlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 #### Tree plot
 
 ```{r gsea_treeplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_tree_plots.pdf"), height = 12)
 
 gseTreePlot <- analyzeRNA::makeGSEplot(
@@ -1167,14 +1302,14 @@ gseTreePlot <- analyzeRNA::makeGSEplot(
 
 gseTreePlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 #### Traditional plot
 
 ```{r gsea_tradplots, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_trad_plots.pdf"))
 
 gseTradPlot <- analyzeRNA::makeGSEplot(
@@ -1185,14 +1320,14 @@ gseTradPlot <- analyzeRNA::makeGSEplot(
 
 gseTradPlot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 #### Category net plot
 
 ```{r category_netplot, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_category_plots.pdf"))
 
 catplot <- analyzeRNA::categorynetplot(
@@ -1206,7 +1341,7 @@ catplot <- analyzeRNA::categorynetplot(
 
 catplot
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -1221,10 +1356,7 @@ If you don't already, go back up and create a second genemap & set of annotated 
 You should also make significant DEG dataframes but set `entrezeid = TRUE` in the `signif_deg` function.
 
 ```{r kegg}
-#remember! you must use the dataframes with the EntrezID here (and not for anythin else)
-
-
-
+# remember! you must use the dataframes with the EntrezID here (and not for anythin else)
 ```
 
 ### Revigo
@@ -1234,18 +1366,19 @@ This can make it hard ot see the overarching pattern.
 The tree map and the cluster map are very helpful for this but this code also will help.
 
 ```{r revigo}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/GSEA_revigo_plots.pdf"))
 
-analyzeRNA::revigoPlot(gsea_obj = one_vs_two_GSEA,
-                       ontol = "BP", #one of "BP", "MF" or "CC"
-                       plotkind = "tree", #one of "tree", "scatter", or "heat"
-                       scoretype = "nes", # one of "pvalue", "qvalue", or "nes"
-                       plttitle = "REVIGO plot",
-                       sim_threshold = 0.7 #similarity threshold, for large change to 0.9, for small change to 0.5
+analyzeRNA::revigoPlot(
+  gsea_obj = one_vs_two_GSEA,
+  ontol = "BP", # one of "BP", "MF" or "CC"
+  plotkind = "tree", # one of "tree", "scatter", or "heat"
+  scoretype = "nes", # one of "pvalue", "qvalue", or "nes"
+  plttitle = "REVIGO plot",
+  sim_threshold = 0.7 # similarity threshold, for large change to 0.9, for small change to 0.5
 )
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
@@ -1266,7 +1399,7 @@ You can also take the top x number of significantly changed genes in some compar
 ### Heatmaps
 
 ```{r heatmap_from_csv, eval=TRUE}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/heatmaps.pdf"))
 
 # make a heatmap from genes saved in a CSV
@@ -1324,25 +1457,25 @@ top_heatmap <- analyzeRNA::heatmapFromDF(
 )
 
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
 
 ### Heatmap from GO pathways
 
 ```{r go_grouping_heatmaps}
-#if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/go_group_heatmaps.pdf"))
 
-go_groups3 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3) 
+go_groups3 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 3)
 
-go_groups4 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4) 
+go_groups4 <- analyzeRNA::goGrouping(one_vs_two, pval_cutoff = 0.05, l2fc_cutoff = 0.45, lvl = 4)
 
-#get the genes in any of these go groups by the row number.
+# get the genes in any of these go groups by the row number.
 
 f <- analyzeRNA::genelistFromGOGroup(go_groups3, 1)
 analyzeRNA::heatmapFromDF("GO Group", f, meta, rlog_df, anno_colors, gaps = c(5), height = 8)
 
-#comment out if you don't want to export images
+# comment out if you don't want to export images
 grDevices::dev.off()
 ```
