@@ -874,7 +874,7 @@ To do this, create a list of MGI symbols and the code will generate plots for al
 The other arguments in the plot will be the same for all genes in the list. If you want to change around the stat comparisons listed for each of the plots check the chunk below this one
 ```{r plot_counts_list}
 # if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/plot_counts.pdf"))
+grDevices::pdf(file = paste0(output_dir, "/plot_counts2.pdf"))
 
 # edit this so that its the right comparisons
 statcomps <- list(
@@ -915,10 +915,10 @@ You will create a list of MGI symbols the same way as above but you'll also crea
 Since each comparison is a bit unwieldy I recommend creating a few variables to cover each possible comparison you're interested in.
 Then you can make a list using these variables.
 The lists need to be in the same order as each other and they also must be the same length.
-```
+
 ```{r plot_counts_list2}
 # if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/plot_counts.pdf"))
+grDevices::pdf(file = paste0(output_dir, "/plot_counts3.pdf"))
 
 # create your possible comparisons (include an empty list if you dont want comparisons on one of your plots)
 comparison1 <- list(
