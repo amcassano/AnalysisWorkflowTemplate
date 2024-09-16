@@ -238,7 +238,7 @@ This code will accomplish a few things in order to get the files in the format n
     This is done to filter out genes that have a high read count for just one sample, but are not expressed in other samples.
     This minimizes noise and removes outliers.
 
-[**Change the group names and count minimum**]{style="color: red"}
+[**Change the group names and number of samples**]{style="color: red"}
 
 ```{r csv_cleanup, eval=TRUE}
 # renames each row as the GeneID and removes the Geneid column
@@ -258,13 +258,8 @@ meta$Group <- factor(meta$Group,
 )
 
 # pre-filtering
-count_minimum <- 800
-
-raw_counts$row_sum <- apply(raw_counts, 1, sum)
-raw_counts <- raw_counts %>%
-  dplyr::filter(row_sum > count_minimum) %>%
-  dplyr::select(-c(row_sum))
-
+num_samples <- 10
+raw_counts <- analyzeRNA::prefilterCounts(raw_counts, num_samples)
 # set the sample ID as the row name for the metadata
 rownames(meta) <- meta$SampleID
 meta <- meta %>% dplyr::select(-c(SampleID))
@@ -869,9 +864,11 @@ analyzeRNA::plot_genecounts(
 grDevices::dev.off()
 ```
 
-The code above will allow you to plot one MGI symbol at a time. If you want to create plots for many different genes at once use this chunk
-To do this, create a list of MGI symbols and the code will generate plots for all genes listed and run the mapping code to do all at once.
-The other arguments in the plot will be the same for all genes in the list. If you want to change around the stat comparisons listed for each of the plots check the chunk below this one
+The code above will allow you to plot one MGI symbol at a time.
+If you want to create plots for many different genes at once use this chunk To do this, create a list of MGI symbols and the code will generate plots for all genes listed and run the mapping code to do all at once.
+The other arguments in the plot will be the same for all genes in the list.
+If you want to change around the stat comparisons listed for each of the plots check the chunk below this one
+
 ```{r plot_counts_list}
 # if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
 grDevices::pdf(file = paste0(output_dir, "/plot_counts2.pdf"))
@@ -910,8 +907,7 @@ purrr::map(genes_to_plot, map_genecounts)
 grDevices::dev.off()
 ```
 
-If you want to have different stats for pairwise comparisons listed for different genes that you're plotting you'll use this
-You will create a list of MGI symbols the same way as above but you'll also create a separate list of comparisons.
+If you want to have different stats for pairwise comparisons listed for different genes that you're plotting you'll use this You will create a list of MGI symbols the same way as above but you'll also create a separate list of comparisons.
 Since each comparison is a bit unwieldy I recommend creating a few variables to cover each possible comparison you're interested in.
 Then you can make a list using these variables.
 The lists need to be in the same order as each other and they also must be the same length.
@@ -1100,31 +1096,63 @@ Important to note: the shared DEGs are those that are found in both dataframes, 
 For that, use the code above, or check the dataframe exported.
 You can also create a dataframe with the genes found in the intersections.
 
-```{r venn_diagrams}
+```{r twoway_venn_diagrams}
 # if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
-grDevices::pdf(file = paste0(output_dir, "/venndiagrams.pdf"))
+grDevices::pdf(file = paste0(output_dir, "/twowayvenndiagrams.pdf"))
 
-two_comp_venndiagram <- analyzeRNA::plot_venndiagram(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol),
-  plt_title = "# DEGs shared vs. Three",
-  edgecolor = c(group1_color, group2_color),
-  showintersects = TRUE
+# First you'll create a list of the comparisons that you want in your venn diagram
+# the list has to be a named list to associate the name of the comparison with the list of genes you're inputing
+# you will be taking the MGI symbol from your filtered list of significant genes in a pairwise comparsion
+twoway_venn_inputs <- list(
+  "One vs Three" = sig_OneTwo$MGI_Symbol,
+  "Two vs Three" = sig_TwoThree$MGI_Symbol
 )
 
-three_comp_venndiagram <- analyzeRNA::plot_venndiagram(
-  list(
-    "One" = sig_OneThree$MGI_Symbol,
-    "Two" = sig_TwoThree$MGI_Symbol,
-    "Four" = sig_FourThree$MGI_Symbol
-  ),
+# if you want the circle edges to be color coded you can also create a list with colors below
+twoway_venn_colors <- c(group1_color, group2_color)
+
+analyzeRNA::plot_venndiagram(
+  degs_list = twoway_venn_inputs,
   plt_title = "# DEGs shared vs. Three",
-  edgecolor = c(group1_color, group2_color, group3_color),
-  showintersects = FALSE
+  edgecolor = twoway_venn_colors
 )
 
 # comment out if you don't want to export images
 grDevices::dev.off()
+```
+
+This chunk will help you make venn diagrams comparing the number of shared DEGs between three sets of pairwise comparisons.
+
+```{r threeway_venndiagrams}
+# if you *don't* want the images exported to pdf, comment the line below and the final line of the chunk out. You can change the size of the images if you'd like
+grDevices::pdf(file = paste0(output_dir, "/threewayvenndiagrams.pdf"))
+
+# First you'll create a list of the comparisons that you want in your venn diagram
+# the list has to be a named list to associate the name of the comparison with the list of genes you're inputing
+# you will be taking the MGI symbol from your filtered list of significant genes in a pairwise comparsion
+threeway_venn_inputs <- list(
+  "One vs Three" = sig_OneTwo$MGI_Symbol,
+  "Two vs Three" = sig_TwoThree$MGI_Symbol,
+  "Four vs Three" = sig_FourThree$MGI_Symbol
+)
+
+# if you want the circle edges to be color coded you can also create a list with colors below
+threeway_venn_colors <- c(group1_color, group2_color, group4_color)
 
 
+analyzeRNA::plot_venndiagram(
+  degs_list = threeway_venn_inputs,
+  plt_title = "# DEGs shared vs. Three",
+  edgecolor = threeway_venn_colors
+)
+
+# comment out if you don't want to export images
+grDevices::dev.off()
+```
+
+If you want to get a list of all the genes in any given section of the venn diagrams you created you'll use this code You can get either the overlaps (what's shared) or the unique unshared genes
+
+```{r}
 overlaps_onetwo_vsthree <- analyzeRNA::venn_overlaps(list("One" = sig_OneThree$MGI_Symbol, "Two" = sig_TwoThree$MGI_Symbol))
 
 overlaps_onetwofour_vsthree <- analyzeRNA::venn_overlaps(list(
