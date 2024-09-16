@@ -241,10 +241,6 @@ This code will accomplish a few things in order to get the files in the format n
 [**Change the group names and number of samples**]{style="color: red"}
 
 ```{r csv_cleanup, eval=TRUE}
-# renames each row as the GeneID and removes the Geneid column
-rownames(raw_counts) <- raw_counts$Geneid
-raw_counts <- dplyr::select(raw_counts, -Geneid)
-
 # set groups as factors
 meta$Group <- factor(meta$Group,
   levels = c(
@@ -259,7 +255,7 @@ meta$Group <- factor(meta$Group,
 
 # pre-filtering
 num_samples <- 10
-raw_counts <- analyzeRNA::prefilterCounts(raw_counts, num_samples)
+raw_counts <- analyzeRNA::prefilterCounts(raw_counts, num_samples, avg_count_minimum = 200, stringency = 2)
 # set the sample ID as the row name for the metadata
 rownames(meta) <- meta$SampleID
 meta <- meta %>% dplyr::select(-c(SampleID))
